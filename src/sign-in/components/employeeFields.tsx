@@ -1,13 +1,10 @@
-// EmployeeFields.jsx
 import React from 'react';
 import { Form, Select, DatePicker, Col, Row } from 'antd';
 
 const { Option } = Select;
 
 const EmployeeFields = () => {
-  // Función para desactivar fechas futuras
   const disabledFutureDate = (current) => {
-    // Verifica si la fecha es después de hoy
     return current && current > new Date();
   };
 
@@ -30,7 +27,6 @@ const EmployeeFields = () => {
           label="Fecha de Contratación"
           rules={[{ required: true, message: 'Por favor selecciona una fecha de contratación' }]}
         >
-          {/* Desactiva fechas futuras en el DatePicker */}
           <DatePicker style={{ width: '100%' }} disabledDate={disabledFutureDate} />
         </Form.Item>
       </Col>
