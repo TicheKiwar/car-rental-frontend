@@ -1,4 +1,3 @@
-// CommonFields.jsx
 import React from 'react';
 import { Form, Input, Row, Col } from 'antd';
 import { UserOutlined, MailOutlined, LockOutlined } from '@ant-design/icons';
