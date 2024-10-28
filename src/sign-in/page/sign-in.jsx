@@ -2,9 +2,9 @@
 import React, { useState } from 'react';
 import { Form, Button, Radio, message, Row, Col } from 'antd';
 import { createClient, createEmployee } from '../../services/sign-in.service';
-import CommonFields from '../components/CommonFields';
-import ClientFields from '../components/ClientFields';
-import EmployeeFields from '../components/EmployeeFields';
+import CommonFields from '../components/commonFields';
+import ClientFields from '../components/clientFields';
+import EmployeeFields from '../components/employeeFields';
 
 const RegistrationForm = () => {
   const [form] = Form.useForm();
