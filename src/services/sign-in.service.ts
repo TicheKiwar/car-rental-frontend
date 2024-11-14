@@ -1,15 +1,8 @@
-import axios from "axios";
-
-const api = axios.create({
-    baseURL: "http://localhost:3000",
-    headers: {
-        "Content-Type": "application/json",
-    },
-});
+import { api } from "./api.service";
 
 export const createClient = async (userData: any) => {
     try {
-        const response = await api.post("/user/clients", userData);
+        const response = await api.post("/clients", userData);
         return response.data;
     } catch (error) {
         console.error("Error al crear el cliente:", error);
@@ -19,7 +12,7 @@ export const createClient = async (userData: any) => {
 
 export const createEmployee = async (userData: any) => {
     try {
-        const response = await api.post("/user/employees", userData);
+        const response = await api.post("/employees", userData);
         return response.data;
     } catch (error) {
         console.error("Error al crear el empleado:", error);
