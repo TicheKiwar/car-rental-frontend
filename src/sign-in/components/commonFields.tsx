@@ -5,8 +5,14 @@ import { UserOutlined, MailOutlined, LockOutlined } from '@ant-design/icons';
 const CommonFields = () => (
   <Row gutter={16}>
     <Col span={12}>
+      <Form.Item name="dni" label="C.I." rules={[{ required: true, message: 'Por favor ingrese su cédula' },
+          ]}>
+        <Input placeholder="Cédula de Identidad" />
+      </Form.Item>
+    </Col>
+    <Col span={12}>
       <Form.Item
-        name="nombre"
+        name="firstName"
         label="Nombre"
         rules={[{ required: true, message: 'Por favor ingresa tu nombre' }, { pattern: /^[a-zA-Z\s]+$/, message: 'El nombre solo puede contener letras' }]}
       >
@@ -15,7 +21,7 @@ const CommonFields = () => (
     </Col>
     <Col span={12}>
       <Form.Item
-        name="apellido"
+        name="lastName"
         label="Apellido"
         rules={[{ required: true, message: 'Por favor ingresa tu apellido' }, { pattern: /^[a-zA-Z\s]+$/, message: 'El apellido solo puede contener letras' }]}
       >
@@ -24,7 +30,7 @@ const CommonFields = () => (
     </Col>
     <Col span={12}>
       <Form.Item
-        name="correo"
+        name="email"
         label="Correo Electrónico"
         rules={[{ required: true, type: 'email', message: 'Por favor ingresa un correo válido' }]}
       >
@@ -33,7 +39,7 @@ const CommonFields = () => (
     </Col>
     <Col span={12}>
       <Form.Item
-        name="contraseña"
+        name="password"
         label="Contraseña"
         rules={[{ required: true, message: 'Por favor ingresa una contraseña' }, { min: 6, message: 'La contraseña debe tener al menos 6 caracteres' }]}
       >
