@@ -1,14 +1,36 @@
-import React from "react";
-import { Form, Input, Button, Checkbox, Typography } from "antd";
+import React, { useState } from "react";
+import { Form, Input, Button, Checkbox, Typography, message } from "antd";
 import { useNavigate } from "react-router-dom";
+import { getUserId } from "../utils/utils.util";
+import { login } from "../services/login.service";
+import { getUserById } from "../services/user.service";
 
 const { Title, Text, Link } = Typography;
 
 const Login: React.FC = () => {
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const onFinish = (values: { email: string; password: string }) => {
-    console.log("Success:", values);
+  const onFinish = async (values: { email: string; password: string }) => {
+    setLoading(true);
+    try {
+      const { data }: { data: any } = await login(values);
+      localStorage.setItem('authToken', data.data.accessToken);
+      const userId = getUserId();
+      
+      if(userId != null){
+        const dataUser: any = await getUserById(userId);
+        
+        if(dataUser){
+        message.success('Inicio de sesión exitoso');
+        }
+      }
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Error al iniciar sesión';
+      message.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onFinishFailed = (errorInfo: any) => {
