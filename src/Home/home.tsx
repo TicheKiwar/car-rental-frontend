@@ -1,37 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { getDatos, fetchData } from "../services/catalog.service";
-import ListVehicle from "../catalog/components/catalog";
-import { VehicleType } from "../common/vehicle.type";
+
 import Menu from "./menu";
+import VehicleCatalog from "../catalog/components/catalog";
 
 const Home: React.FC = () => {
-  const [searchText, setSearchText] = useState<string>("");
-  const [datos, setDatos] = useState<VehicleType[]>([]);
-  const [reload, setReload] = useState<boolean>(false);
-
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    fetchData().then(() => {
-      setDatos(getDatos());
-    });
-  }, [navigate]);
-
-  const handleSearch = (value: string) => {
-    setSearchText(value);
-  };
-
-  const handleDataChange = () => {
-    setReload(!reload);
-  };
-
-  const filteredData = datos.filter(
-    (item: VehicleType) =>
-      item.color.toLowerCase().includes(searchText.toLowerCase()) ||
-      item.estado.toLowerCase().includes(searchText.toLowerCase())
-  );
 
   return (
     <div className="flex h-screen">
@@ -40,7 +14,7 @@ const Home: React.FC = () => {
       </div>
       <div className="flex-grow flex flex-col items-center p-4">
         <div className="w-2/3 min-h-[809px]">
-          <ListVehicle data={filteredData} />
+          <VehicleCatalog />
         </div>
       </div>
     </div>

@@ -1,48 +1,45 @@
 import { VehicleType } from "../common/vehicle.type";
+import { api } from "./api.service";
 
-let datos: VehicleType[] = [];
+let data: VehicleType[] = [];
 
 async function fetchData(): Promise<void> {
   try {
-    const response = await fetch(`http://192.168.231.128:3000/catalog`);
+    const response = await api.get("/catalog");
 
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-
-    const responseData = await response.json();
-    datos = responseData.map((item: any) => ({
-      idVehiculo: item.idVehiculo,
-      matricula: item.matricula,
-      tipo: item.tipo ?? "Desconocido",
-      estado: item.estado ?? "No especificado",
-      tarifaXDia: item.tarifaXDia ?? "50.00",
-      capacidad: item.capacidad ?? 5,
-      calidad: item.calidad ?? "Alta",
-      velocidadMaxima: item.velocidadMaxima ?? 200,
-      color: item.color ?? "Blanco",
-      transmision: item.transmision ?? "Manual",
-      numeroPuertas: item.numeroPuertas ?? 4,
-      combustible: item.combustible ?? "Gasolina",
-      idModelo: {
-        idModelo: item.idModelo.idModelo,
-        nombre: item.idModelo.nombre ?? "Modelo desconocido",
-        aO: item.idModelo.aO ?? 2023,
-        idMarca: {
-          idMarca: item.idModelo.idMarca.idMarca,
-          nombre: item.idModelo.idMarca.nombre ?? "Marca desconocida",
+    const responseData = await response.data;
+    data = responseData.map((item: any) => ({
+      vehicleId: item.vehicleId,
+      licensePlate: item.licensePlate,
+      type: item.type ?? "Unknown",
+      status: item.status ?? "Not specified",
+      dailyRate: item.dailyRate ?? "50.00",
+      capacity: item.capacity ?? 5,
+      quality: item.quality ?? "High",
+      maxSpeed: item.maxSpeed ?? 200,
+      color: item.color ?? "White",
+      transmission: item.transmission ?? "Manual",
+      doorCount: item.doorCount ?? 4,
+      fuelType: item.fuelType ?? "Gasoline",
+      model: {
+        modelId: item.model.modelId,
+        name: item.model.modelName ?? "Unknown model",
+        year: item.model.year ?? 2023,
+        brand: {
+          brandId: item.model.brand.brandId,
+          name: item.model.brand.brandName ?? "Unknown brand",
         },
-        vehiculos: [],
+        vehicles: [],
       },
     }));
   } catch (error) {
-    console.error("Error al obtener los datos:", error);
-    datos = [];
+    console.error("Error fetching data:", error);
+    data = [];
   }
 }
 
-export function getDatos(): VehicleType[] {
-  return datos;
+export function getData(): VehicleType[] {
+  return data;
 }
 
 export { fetchData };
