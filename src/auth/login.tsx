@@ -33,10 +33,8 @@ const Login: React.FC = () => {
         }
       }
     } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message || "Error al iniciar sesión";
+      const errorMessage ="El usuario o la contraseña son incorrectos";
       message.error(errorMessage);
-      console.log(error);
     } finally {
       setLoading(false);
     }
