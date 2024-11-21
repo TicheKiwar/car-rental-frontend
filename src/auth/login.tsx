@@ -27,8 +27,11 @@ const Login: React.FC = () => {
           message.success("Inicio de sesión exitoso");
           if (dataUser.data.role.roleId === 3) {
             navigate("/home");
-          } else {
-            message.warning("No tienes acceso como cliente.");
+          } else if (dataUser.data.role.roleId === 1) {
+            navigate("/menu ");
+          }
+           else {
+            return
           }
         }
       }
