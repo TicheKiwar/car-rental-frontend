@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Input, Table, Button, Space} from "antd";
+import { Input, Table, Button, Space, message, Modal } from "antd";
 import {
   PlusCircleOutlined,
   EditOutlined,
   DeleteOutlined,
   InfoCircleOutlined,
 } from "@ant-design/icons";
-import fetchVehicles from "./vehicle.service";
+import { fetchVehicles, deleteVehicle } from "./vehicle.service";
 import { Vehicle } from "./Ivehicle";
 import VehicleInfoModal from "./VehicleInfo.modal";
 import NewVehicleModal from "./Vehicle.modal";
@@ -18,7 +18,10 @@ const VehicleManagement = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [isNewVehicleModalVisible, setIsNewVehicleModalVisible] = useState(false);
+  const [deleteVehicleId, setDeleteVehicleId] = useState<number | null>(null); // Estado para almacenar el ID del vehículo a eliminar
+  const [isConfirmDeleteModalVisible, setIsConfirmDeleteModalVisible] = useState(false); // Modal de confirmación
 
+  // Fetch vehicles when the component loads
   useEffect(() => {
     const fetchData = async () => {
       const vehicles = await fetchVehicles();
@@ -28,15 +31,56 @@ const VehicleManagement = () => {
     fetchData();
   }, []);
 
+  // Handle saving a new vehicle
+  const handleSaveVehicle = async (vehicleData: any) => {
+    console.log("Nuevo vehículo guardado:", vehicleData);
 
+    // Fetch all vehicles again to get the updated list
+    try {
+      const vehicles = await fetchVehicles();
+      setAllVehicles(vehicles);
+      setTableData(vehicles);
+    } catch (error) {
+      message.error("Error al actualizar la lista de vehículos");
+    }
+  };
+
+  // Handle edit vehicle (example)
   const handleEdit = (vehicleId: number) => {
     alert(`Editar vehículo con ID: ${vehicleId}`);
   };
 
+  // Handle delete vehicle
   const handleDelete = (vehicleId: number) => {
-    alert(`Eliminar vehículo con ID: ${vehicleId}`);
+    setDeleteVehicleId(vehicleId); // Establecer el ID del vehículo a eliminar
+    setIsConfirmDeleteModalVisible(true); // Mostrar el modal de confirmación
   };
 
+  const confirmDelete = async () => {
+    if (deleteVehicleId !== null) {
+      try {
+        await deleteVehicle(deleteVehicleId); // Llama al servicio para eliminar el vehículo
+        // Actualiza la lista de vehículos después de la eliminación
+        const updatedVehicles = allVehicles.filter(
+          (vehicle) => vehicle.vehicleId !== deleteVehicleId
+        );
+        setAllVehicles(updatedVehicles);
+        setTableData(updatedVehicles);
+        //message.success("Vehículo eliminado exitosamente.");
+      } catch (error) {
+        message.error("Error al eliminar el vehículo.");
+      }
+    }
+    setIsConfirmDeleteModalVisible(false); // Cierra el modal de confirmación
+    setDeleteVehicleId(null); // Restablece el ID del vehículo a eliminar
+  };
+
+  const cancelDelete = () => {
+    setIsConfirmDeleteModalVisible(false); // Cierra el modal sin eliminar
+    setDeleteVehicleId(null); // Restablece el ID del vehículo a eliminar
+  };
+
+  // Handle vehicle info
   const handleInfo = (vehicleId: number) => {
     const vehicle = allVehicles.find((v) => v.vehicleId === vehicleId);
     setSelectedVehicle(vehicle || null);
@@ -50,12 +94,6 @@ const VehicleManagement = () => {
 
   const handleAddVehicle = () => {
     setIsNewVehicleModalVisible(true);
-  };
-
-  const handleSaveVehicle = (vehicleData: any) => {
-    console.log("Nuevo vehículo guardado:", vehicleData);
-    setAllVehicles([...allVehicles, vehicleData]);
-    setTableData([...allVehicles, vehicleData]);
   };
 
   const columns = [
@@ -78,12 +116,12 @@ const VehicleManagement = () => {
       key: "type",
     },
     {
-      title: "Brand",
+      title: "Marca",
       dataIndex: "brand",
       key: "brand",
     },
     {
-      title: "Model",
+      title: "Modelo",
       dataIndex: "model",
       key: "model",
     },
@@ -93,7 +131,7 @@ const VehicleManagement = () => {
       key: "color",
     },
     {
-      title: "Status",
+      title: "Estado",
       dataIndex: "status",
       key: "status",
     },
@@ -112,11 +150,11 @@ const VehicleManagement = () => {
           />
           <Button
             icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record.vehicleId)}
+            onClick={() => handleDelete(record.vehicleId)} // Llamada al servicio de eliminación
             shape="circle"
             size="small"
             title="Eliminar"
-            style={{ color: "orange" }}
+            style={{ color: "red" }}
           />
           <Button
             icon={<InfoCircleOutlined />}
@@ -135,13 +173,17 @@ const VehicleManagement = () => {
     const value = e.target.value.toLowerCase();
     setSearchTerm(value);
 
-    setTableData(
-      allVehicles.filter(
-        (item) =>
-          item.model.brand.brandName.toLowerCase().includes(value) || // Corregido: accede a la marca correctamente.
-          item.model.modelName.toLowerCase().includes(value)         // Usa `modelName` para buscar el modelo.
-      )
-    );
+    if (value === "") {
+      setTableData(allVehicles);
+    } else {
+      setTableData(
+        allVehicles.filter(
+          (item) =>
+            item.color.toLowerCase().includes(value) ||
+            item.type.toLowerCase().includes(value)
+        )
+      );
+    }
   };
 
   return (
@@ -192,9 +234,18 @@ const VehicleManagement = () => {
         onClose={() => setIsNewVehicleModalVisible(false)}
         onSave={handleSaveVehicle}
       />
-
+      {/* Modal de Confirmación de Eliminación */}
+      <Modal
+        title="Confirmación"
+        visible={isConfirmDeleteModalVisible}
+        onOk={confirmDelete}
+        onCancel={cancelDelete}
+        okText="Sí"
+        cancelText="No"
+      >
+        <p>Este vehículo será eliminado, ¿desea continuar?</p>
+      </Modal>
     </div>
-
   );
 };
 
