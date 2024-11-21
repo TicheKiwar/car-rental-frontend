@@ -16,7 +16,6 @@ function App() {
       <Routes>
         {/* <Route path="/" element={<Menu  />} /> */}
         <Route path="/" element={<Login/>} />
-        <Route path="/" element={<Menu  />} />
         
         <Route path="/register" element={<RegistrationForm />} />
         <Route path="/password_reset" element={<ForgotPassword/>} />
