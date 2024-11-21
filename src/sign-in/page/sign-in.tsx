@@ -1,9 +1,12 @@
 import React from 'react';
-import { Form, Button, message } from 'antd';
+import { Form, Button, message, Typography } from 'antd';
 import { createClient } from '../../services/sign-in.service';
 import CommonFields from '../components/commonFields';
 import { useNavigate } from 'react-router-dom';
 import ClientFields from '../components/clientFields';
+import Link from 'antd/es/typography/Link';
+
+const { Text } = Typography;
 
 const RegistrationForm = () => {
   const [form] = Form.useForm();
@@ -33,6 +36,12 @@ const RegistrationForm = () => {
           </Button>
         </Form.Item>
       </Form>
+      <div style={{ textAlign: "center", marginTop: 16 }}>
+          <Text>
+            ¿Ya tienes una cuenta?{" "}
+            <Link onClick={() => navigate("/")}>Inicia Sesión</Link>
+          </Text>
+        </div>
     </div>
   );
 };
