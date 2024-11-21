@@ -1,0 +1,105 @@
+/* Contenedor principal */
+.home-container {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #f9f9f9; /* Fondo claro */
+  }
+  
+  /* Encabezado */
+  .home-header {
+    background-color: #e6e6e6; /* Fondo gris claro */
+    padding: 16px 24px;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .home-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+  }
+  
+  .home-breadcrumb {
+    font-size: 14px;
+    color: #666;
+    margin-top: 8px;
+  }
+  
+  .home-breadcrumb a {
+    color: #0072ce;
+    text-decoration: none;
+  }
+  
+  .home-breadcrumb a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Contenido principal */
+  .home-main-content {
+    display: flex;
+    flex-grow: 1;
+    margin: 16px 24px;
+  }
+  
+  /* Sidebar (Menú) */
+  .home-sidebar {
+    width: 20%;
+    padding: 16px;
+    background-color: #f0f0f0; /* Fondo gris suave */
+    border-right: 1px solid #ccc;
+  }
+  
+  /* Contenedor del catálogo */
+  .home-catalog {
+    flex-grow: 1;
+    padding: 16px;
+    background-color: #ffffff; /* Fondo blanco */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+  
+  /* Footer */
+  .home-footer {
+    background-color: #333; /* Fondo oscuro */
+    color: #fff;
+    padding: 24px;
+  }
+  
+  .home-footer-sections {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  
+  .home-footer-sections div {
+    width: 20%;
+  }
+  
+  .home-footer-sections h4 {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  
+  .home-footer-sections ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .home-footer-sections li {
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+  
+  .home-footer-sections li:hover {
+    text-decoration: underline;
+  }
+  
+  .home-footer-copyright {
+    text-align: center;
+    font-size: 12px;
+    color: #aaa;
+  }
+  

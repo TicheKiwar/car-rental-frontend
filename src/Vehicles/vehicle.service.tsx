@@ -3,7 +3,7 @@ import { Vehicle, VehicleModel } from "./Ivehicle"; // Asegúrate de que las int
 import { message } from "antd";
 
 // URL base de la API (ajústala si es necesario)
-const API_URL = "http://localhost:3000";
+const API_URL = "http://192.168.231.128:3000";
 
 // Función para obtener los vehículos
 const fetchVehicles = async (): Promise<Vehicle[]> => {
