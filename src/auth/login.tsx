@@ -16,20 +16,27 @@ const Login: React.FC = () => {
     setLoading(true);
     try {
       const { data }: { data: any } = await login(values);
-      localStorage.setItem("authToken", data.data.accessToken);
+      localStorage.setItem("authToken", data.accessToken);
       const userId = getUserId();
 
       if (userId != null) {
         const dataUser: any = await getUserById(userId);
+        console.log(dataUser.data.role);
 
         if (dataUser) {
           message.success("Inicio de sesión exitoso");
+          if (dataUser.data.role.roleId === 3) {
+            navigate("/home");
+          } else {
+            message.warning("No tienes acceso como cliente.");
+          }
         }
       }
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || "Error al iniciar sesión";
       message.error(errorMessage);
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -66,8 +73,9 @@ const Login: React.FC = () => {
             style={{ width: 130, marginBottom: 16 }}
           />
           <Title level={3} style={{ marginBottom: 0 }}>
+            Iniciar Sesión
           </Title>
-          <Text type="secondary">Bienvenido, Inicia sesión para continuar</Text>
+          <Text type="secondary">Bienvenido, inicia sesión para continuar</Text>
         </div>
 
         <Form
@@ -114,7 +122,10 @@ const Login: React.FC = () => {
           </Form.Item>
 
           <div style={{ textAlign: "center", marginBottom: 16 }}>
-            <Link onClick={()=> navigate("/password_reset")} style={{ fontSize: "14px" }}>
+            <Link
+              onClick={() => navigate("/password_reset")}
+              style={{ fontSize: "14px" }}
+            >
               Olvidé mi contraseña
             </Link>
           </div>

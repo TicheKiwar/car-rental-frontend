@@ -5,7 +5,7 @@ export const login = async (values: any) => {
         const response = await api.post('/auth/login', values);
         return response.data;
     } catch (error) {
-        console.error("Error al crear el empleado:", error);
+        console.error("Error al iniciar sesión:", error);
         throw error;
     }
 };
