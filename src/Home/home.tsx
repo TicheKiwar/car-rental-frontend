@@ -27,11 +27,12 @@ const Home: React.FC = () => {
     setReload(!reload);
   };
 
-  const filteredData = datos.filter(
-    (item: VehicleType) =>
-      item.color.toLowerCase().includes(searchText.toLowerCase()) ||
-      item.estado.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const filteredData = datos.filter((item: VehicleType) => {
+    const color = item.color?.toLowerCase() || '';
+    const estado = item.estado?.toLowerCase() || '';
+  
+    return color.includes(searchText.toLowerCase()) || estado.includes(searchText.toLowerCase());
+  });
 
   return (
     <div className="flex h-screen">

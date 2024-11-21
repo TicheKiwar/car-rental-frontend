@@ -5,6 +5,7 @@ import {
   DisconnectOutlined,
   DiffOutlined,
   UnlockOutlined,
+  CarOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 
@@ -53,6 +54,16 @@ const Menu: React.FC<ListStudentsProps> = ({  }) => {
             console.log("Cambiando contraseña...");
           }}
         /> */}
+
+                {/* Agregamos el ícono del coche */}
+                <FloatButton
+          tooltip={<div>Autos</div>}
+          icon={<CarOutlined />}  // Ícono de coche
+          onClick={() => {
+            console.log("Mostrando detalles del coche...");
+          }}
+        />
+
         <FloatButton
           tooltip={<div>Cerrar Sesión</div>}
           icon={<DisconnectOutlined />}
