@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Input, Table, Button, Space, message, Modal } from "antd";
+import { Input, Table, Button, Space, message, Modal} from "antd";
 import { PlusCircleOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { fetchModels, deleteModel } from "./model.service";
 import { Model } from "./Imodel";

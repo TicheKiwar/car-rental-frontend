@@ -1,24 +1,33 @@
 import React, { useState, useEffect } from "react";
-import { Input, Table, Button, Space } from "antd";
-import { PlusCircleOutlined, EditOutlined, DeleteOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import { Input, Table, Button, Space} from "antd";
+import {
+  PlusCircleOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  InfoCircleOutlined,
+} from "@ant-design/icons";
 import fetchVehicles from "./vehicle.service";
 import { Vehicle } from "./Ivehicle";
+import VehicleInfoModal from "./VehicleInfo.modal";
+import NewVehicleModal from "./Vehicle.modal";
 
 const VehicleManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [dataSource, setDataSource] = useState<Vehicle[]>([]); // Especifica el tipo
+  const [allVehicles, setAllVehicles] = useState<Vehicle[]>([]);
+  const [tableData, setTableData] = useState<Vehicle[]>([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
+  const [isNewVehicleModalVisible, setIsNewVehicleModalVisible] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       const vehicles = await fetchVehicles();
-      setDataSource(vehicles);
+      setAllVehicles(vehicles);
+      setTableData(vehicles);
     };
     fetchData();
   }, []);
 
-  const handleAddVehicle = () => {
-    alert("Agregar nuevo vehículo");
-  };
 
   const handleEdit = (vehicleId: number) => {
     alert(`Editar vehículo con ID: ${vehicleId}`);
@@ -29,7 +38,24 @@ const VehicleManagement = () => {
   };
 
   const handleInfo = (vehicleId: number) => {
-    alert(`Mostrar información del vehículo con ID: ${vehicleId}`);
+    const vehicle = allVehicles.find((v) => v.vehicleId === vehicleId);
+    setSelectedVehicle(vehicle || null);
+    setIsModalVisible(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalVisible(false);
+    setSelectedVehicle(null);
+  };
+
+  const handleAddVehicle = () => {
+    setIsNewVehicleModalVisible(true);
+  };
+
+  const handleSaveVehicle = (vehicleData: any) => {
+    console.log("Nuevo vehículo guardado:", vehicleData);
+    setAllVehicles([...allVehicles, vehicleData]);
+    setTableData([...allVehicles, vehicleData]);
   };
 
   const columns = [
@@ -42,7 +68,9 @@ const VehicleManagement = () => {
       title: "Image",
       dataIndex: "image",
       key: "image",
-      render: (image: string) => <img src={image} alt="vehicle" style={{ width: 50, height: 50 }} />,
+      render: (image: string) => (
+        <img src={image} alt="vehicle" style={{ width: 50, height: 50 }} />
+      ),
     },
     {
       title: "Tipo",
@@ -106,20 +134,37 @@ const VehicleManagement = () => {
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.toLowerCase();
     setSearchTerm(value);
-    setDataSource((prevData) =>
-      prevData.filter(
+
+    setTableData(
+      allVehicles.filter(
         (item) =>
-          item.brand.toLowerCase().includes(value) ||
-          item.model.toLowerCase().includes(value)
+          item.model.brand.brandName.toLowerCase().includes(value) || // Corregido: accede a la marca correctamente.
+          item.model.modelName.toLowerCase().includes(value)         // Usa `modelName` para buscar el modelo.
       )
     );
   };
 
   return (
-    <div style={{ padding: "20px", backgroundColor: "white", fontFamily: "Arial, sans-serif" }}>
-      <h1 style={{ fontFamily: "Arial, sans-serif", fontSize: "30px" }}>Alquiler de Vehículos</h1>
-      <h2 style={{ fontFamily: "Arial, sans-serif", fontSize: "24px" }}>Administración de Vehículos</h2>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
+    <div
+      style={{
+        padding: "20px",
+        backgroundColor: "white",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      <h1 style={{ fontFamily: "Arial, sans-serif", fontSize: "30px" }}>
+        Alquiler de Vehículos
+      </h1>
+      <h2 style={{ fontFamily: "Arial, sans-serif", fontSize: "24px" }}>
+        Administración de Vehículos
+      </h2>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "20px",
+        }}
+      >
         <Input.Search
           placeholder="Buscar vehículos"
           onChange={handleSearch}
@@ -136,8 +181,20 @@ const VehicleManagement = () => {
           Agregar Vehículo
         </Button>
       </div>
-      <Table dataSource={dataSource} columns={columns} />
+      <Table dataSource={tableData} columns={columns} />
+      <VehicleInfoModal
+        visible={isModalVisible}
+        onClose={handleModalClose}
+        vehicle={selectedVehicle}
+      />
+      <NewVehicleModal
+        visible={isNewVehicleModalVisible}
+        onClose={() => setIsNewVehicleModalVisible(false)}
+        onSave={handleSaveVehicle}
+      />
+
     </div>
+
   );
 };
 
