@@ -14,7 +14,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Menu  />} />
+        {/* <Route path="/" element={<Menu  />} /> */}
         <Route path="/" element={<Login/>} />
         <Route path="/register" element={<RegistrationForm />} />
         <Route path="/password_reset" element={<ForgotPassword/>} />
