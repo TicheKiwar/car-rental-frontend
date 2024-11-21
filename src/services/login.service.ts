@@ -9,3 +9,11 @@ export const login = async (values: any) => {
         throw error;
     }
 };
+
+export const forgotPasswordEmail = async (email: string) => {
+    await api.post(`/auth/recover-password`, { email });
+}
+
+export const recoverPassword = async (token: string, newPassword: string) => {
+    await api.post(`/auth/reset-password`, { token, newPassword });
+}
