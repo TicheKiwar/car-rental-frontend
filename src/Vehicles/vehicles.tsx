@@ -5,11 +5,13 @@ import {
   EditOutlined,
   DeleteOutlined,
   InfoCircleOutlined,
+  HomeOutlined, // Importa el icono de la casa
 } from "@ant-design/icons";
 import { fetchVehicles, deleteVehicle } from "./vehicle.service";
 import { Vehicle } from "./Ivehicle";
 import VehicleInfoModal from "./VehicleInfo.modal";
 import NewVehicleModal from "./Vehicle.modal";
+import { Link } from "react-router-dom"; // Importa el Link de react-router-dom
 
 const VehicleManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -134,7 +136,6 @@ const VehicleManagement = () => {
           />
         );
       },
-      
     },
     {
       title: "Tipo",
@@ -196,8 +197,25 @@ const VehicleManagement = () => {
   ];
 
   return (
-    <div style={{ padding: "20px", backgroundColor: "white" }}>
+    <div style={{ padding: "20px", backgroundColor: "white", position: "relative" }}>
       <h1>Administración de Vehículos</h1>
+      
+      {/* Botón para redirigir a la ruta "/home" con un icono de casa */}
+      <Link to="/home">
+        <Button
+          icon={<HomeOutlined />} // Usamos el icono HomeOutlined de Ant Design
+          shape="circle"
+          style={{
+            position: "absolute",
+            top: 20,
+            right: 20,
+            borderColor: "transparent",
+            backgroundColor: "#ffffff",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          }}
+        />
+      </Link>
+
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
         <Input.Search
           placeholder="Buscar vehículos"
