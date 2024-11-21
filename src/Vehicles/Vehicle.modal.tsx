@@ -1,6 +1,11 @@
-import React, { useState } from "react";
-import { Modal, Form, Input, Button, Upload, message, Row, Col } from "antd";
+import React, { useState, useEffect } from "react";
+import { Modal, Form, Input, Button, Upload, message, Row, Col, Select, DatePicker } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
+import { VehicleModel } from "./Ivehicle";
+import { fetchModels } from "./vehicle.service";
+import { createVehicle } from "./vehicle.service";  // Asegúrate de tener la función para crear el vehículo
+
+const { Option } = Select;
 
 const NewVehicleModal = ({
   visible,
@@ -14,6 +19,20 @@ const NewVehicleModal = ({
   const [form] = Form.useForm();
   const [isDirty, setIsDirty] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [models, setModels] = useState<VehicleModel[]>([]);
+  const [selectedModel, setSelectedModel] = useState<VehicleModel | null>(null);
+
+  useEffect(() => {
+    if (visible) {
+      fetchModels()
+        .then((response) => {
+          setModels(response);
+        })
+        .catch(() => {
+          message.error("Error al cargar los modelos de autos");
+        });
+    }
+  }, [visible]);
 
   const handleFileChange = (info: any) => {
     const { file } = info;
@@ -40,19 +59,50 @@ const NewVehicleModal = ({
   };
 
   const handleSave = () => {
+    if (!selectedModel) {
+      message.error("Debe seleccionar un modelo de vehículo");
+      return;
+    }
+
     form
       .validateFields()
       .then((values) => {
         const vehicleData = {
           ...values,
-          image: imageFile,
+          modelId: selectedModel?.modelId,
+          capacity: Number(values.capacity),
+          maxSpeed: Number(values.maxSpeed),
+          mileage: Number(values.mileage),
+          doorCount: Number(values.doorCount),
+          dailyRate: String(values.dailyRate), // Parsear a número decimal
+          costDayDelay: String(values.costDayDelay), // Parsear a número decimal
+          lastRevisionDate: values.lastRevisionDate?.format("YYYY-MM-DD"),
+          registrationDate: values.registrationDate?.format("YYYY-MM-DD"),
         };
-        onSave(vehicleData);
-        message.success("Auto guardado exitosamente");
-        form.resetFields();
-        setImageFile(null);
-        setIsDirty(false);
-        onClose();
+
+        console.log("Datos que se enviarán al backend:", vehicleData);
+
+        Modal.confirm({
+          title: "Confirmar guardado",
+          content: "¿Está seguro de que desea guardar este vehículo?",
+          okText: "Sí",
+          cancelText: "No",
+          onOk: () => {
+            createVehicle(vehicleData)  // Llama a la API para guardar el vehículo
+              .then((response) => {
+                message.success("Auto guardado exitosamente");
+                form.resetFields();
+                setImageFile(null);
+                setSelectedModel(null);
+                setIsDirty(false);
+                onClose();
+                window.location.reload();
+              })
+              .catch(() => {
+                message.error("No se guardó el auto. Verifique los campos.");
+              });
+          },
+        });
       })
       .catch(() => {
         message.error("No se guardó el auto. Verifique los campos.");
@@ -61,6 +111,11 @@ const NewVehicleModal = ({
 
   const handleValuesChange = () => {
     setIsDirty(true);
+  };
+
+  const handleModelChange = (value: any) => {
+    const model = models.find((model) => model.modelId === value);
+    setSelectedModel(model || null);
   };
 
   return (
@@ -100,6 +155,7 @@ const NewVehicleModal = ({
         }}
       >
         <Row gutter={16}>
+          {/* Columna 1 */}
           <Col span={12}>
             <Form.Item label="Imagen" valuePropName="file">
               <Upload
@@ -122,16 +178,26 @@ const NewVehicleModal = ({
             <Form.Item
               label="Tipo"
               name="type"
-              rules={[{ required: true, message: "Ingrese el tipo" }]}
+              rules={[{ required: true, message: "Ingrese el tipo de vehículo" }]}
             >
               <Input />
             </Form.Item>
             <Form.Item
               label="Estado"
               name="status"
-              rules={[{ required: true, message: "Ingrese el estado" }]}
+              rules={[{ required: true, message: "Seleccione el estado del vehículo" }]}
             >
-              <Input />
+              <Select>
+                <Option value="Available">Available</Option>
+                <Option value="Unavailable">Unavailable</Option>
+              </Select>
+            </Form.Item>
+            <Form.Item
+              label="Tarifa diaria"
+              name="dailyRate"
+              rules={[{ required: true, message: "Ingrese la tarifa diaria" }]}
+            >
+              <Input type="number" />
             </Form.Item>
             <Form.Item
               label="Capacidad"
@@ -150,25 +216,25 @@ const NewVehicleModal = ({
             <Form.Item
               label="Color"
               name="color"
-              rules={[{ required: true, message: "Ingrese el color" }]}
+              rules={[{ required: true, message: "Ingrese el color del vehículo" }]}
             >
               <Input />
             </Form.Item>
           </Col>
+
+          {/* Columna 2 */}
           <Col span={12}>
-            <Form.Item
-              label="Precio por día"
-              name="dailyRate"
-              rules={[{ required: true, message: "Ingrese el precio por día" }]}
-            >
-              <Input />
-            </Form.Item>
             <Form.Item
               label="Transmisión"
               name="transmission"
-              rules={[{ required: true, message: "Ingrese la transmisión" }]}
+              rules={[{ required: true, message: "Seleccione la transmisión" }]}
             >
-              <Input />
+              <Select>
+                <Option value="Manual">Manual</Option>
+                <Option value="Automatic">Automatic</Option>
+                <Option value="Semi-Automatic">Semi-Automatic</Option>
+                <Option value="Dual-Clutch">Dual-Clutch</Option>
+              </Select>
             </Form.Item>
             <Form.Item
               label="Número de puertas"
@@ -180,9 +246,14 @@ const NewVehicleModal = ({
             <Form.Item
               label="Tipo de combustible"
               name="fuelType"
-              rules={[{ required: true, message: "Ingrese el tipo de combustible" }]}
+              rules={[{ required: true, message: "Seleccione el tipo de combustible" }]}
             >
-              <Input />
+              <Select>
+                <Option value="Gasoline">Gasoline</Option>
+                <Option value="Diesel">Diesel</Option>
+                <Option value="Electricity">Electricity</Option>
+                <Option value="Hybrid">Hybrid</Option>
+              </Select>
             </Form.Item>
             <Form.Item
               label="Kilometraje"
@@ -194,25 +265,40 @@ const NewVehicleModal = ({
             <Form.Item
               label="Fecha de última revisión"
               name="lastRevisionDate"
-              rules={[
-                { required: true, message: "Ingrese la fecha de última revisión" },
-              ]}
+              rules={[{ required: true, message: "Ingrese la fecha de última revisión" }]}
             >
-              <Input type="date" />
+              <DatePicker style={{ width: "100%" }} />
             </Form.Item>
             <Form.Item
               label="Fecha de registro"
               name="registrationDate"
               rules={[{ required: true, message: "Ingrese la fecha de registro" }]}
             >
-              <Input type="date" />
+              <DatePicker style={{ width: "100%" }} />
             </Form.Item>
             <Form.Item
               label="Costo por día de retraso"
               name="costDayDelay"
               rules={[{ required: true, message: "Ingrese el costo por día de retraso" }]}
             >
-              <Input />
+              <Input type="number" />
+            </Form.Item>
+            <Form.Item
+              label="Modelo"
+              name="modelId"
+              rules={[{ required: true, message: "Seleccione un modelo" }]}
+            >
+              <Select
+                placeholder="Seleccione un modelo"
+                onChange={handleModelChange}
+                value={selectedModel ? selectedModel.modelId : undefined}
+              >
+                {models.map((model) => (
+                  <Option key={model.modelId} value={model.modelId}>
+                    {model.modelName}
+                  </Option>
+                ))}
+              </Select>
             </Form.Item>
           </Col>
         </Row>
