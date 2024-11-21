@@ -5,26 +5,20 @@ import {
   DisconnectOutlined,
   DiffOutlined,
   UnlockOutlined,
+  CarOutlined,
+  AppstoreAddOutlined,  // Ícono para la gestión de modelos
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 
 interface ListStudentsProps {
-  //onDataChange: () => void;
-  //userID: number;
+  // onDataChange: () => void;
+  // userID: number;
 }
-const Menu: React.FC<ListStudentsProps> = ({  }) => {
+const Menu: React.FC<ListStudentsProps> = ({}) => {
   const [showModal, setShowModal] = useState(false);
   const handleShow = () => setShowModal(true);
   const handleClose = () => setShowModal(false);
   const navigate = useNavigate();
-
-  //const handleFormSubmit = async (data: any) => {
-    //const respose = await request(data);
-    //if (respose) {
-      // onDataChange();
-    //}
-   // return respose;
-  //};
 
   const handleLogout = () => {
     console.log("Cerrando sesión...");
@@ -36,7 +30,7 @@ const Menu: React.FC<ListStudentsProps> = ({  }) => {
       <FloatButton.Group
         trigger="hover"
         type="default"
-        style={{ }}
+        style={{}}
         icon={<BarsOutlined />}
         shape="square"
       >
@@ -46,13 +40,26 @@ const Menu: React.FC<ListStudentsProps> = ({  }) => {
           onClick={handleShow}
         />
         
-        {/* <FloatButton
-          tooltip={<div>Cambiar contraseña</div>}
-          icon={<UnlockOutlined />}
+        {/* Agregamos el ícono del coche */}
+        <FloatButton
+          tooltip={<div>Vehículos</div>}
+          icon={<CarOutlined />}  // Ícono de coche
           onClick={() => {
-            console.log("Cambiando contraseña...");
+            console.log("Redirigiendo a la gestión de vehículos...");
+            navigate("/vehicle-management");  // Redirige a la página de gestión de vehículos
           }}
-        /> */}
+        />
+
+        {/* Agregamos el ícono de gestión de modelos */}
+        <FloatButton
+          tooltip={<div>Gestión de Modelos</div>}
+          icon={<AppstoreAddOutlined />}  // Ícono para gestión de modelos
+          onClick={() => {
+            console.log("Redirigiendo a la gestión de modelos...");
+            navigate("/model-management");  // Redirige a la página de gestión de modelos
+          }}
+        />
+
         <FloatButton
           tooltip={<div>Cerrar Sesión</div>}
           icon={<DisconnectOutlined />}
