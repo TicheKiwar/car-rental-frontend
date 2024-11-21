@@ -88,7 +88,7 @@ const VehicleManagement = () => {
             shape="circle"
             size="small"
             title="Eliminar"
-            style={{ color: "red" }}
+            style={{ color: "orange" }}
           />
           <Button
             icon={<InfoCircleOutlined />}

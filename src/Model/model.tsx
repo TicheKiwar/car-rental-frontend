@@ -1,35 +1,76 @@
 import React, { useState, useEffect } from "react";
-import { Input, Table, Button, Space } from "antd";
-import { PlusCircleOutlined, EditOutlined, DeleteOutlined, InfoCircleOutlined } from "@ant-design/icons";
-import fetchModels from "./model.service";
+import { Input, Table, Button, Space, message, Modal } from "antd";
+import { PlusCircleOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { fetchModels, deleteModel } from "./model.service";
 import { Model } from "./Imodel";
+import NewModelModal from "./model.modal";
 
 const ModelManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [dataSource, setDataSource] = useState<Model[]>([]);
+  const [allModels, setAllModels] = useState<Model[]>([]);  // Guardar todos los modelos aquí
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modelToEdit, setModelToEdit] = useState<Model | undefined>(undefined);  // Cambiar a `Model | undefined`
+
+  // Función para cargar los modelos
+  const fetchData = async () => {
+    const models = await fetchModels();
+    setAllModels(models);  // Guardamos todos los modelos
+    setDataSource(models); // Inicializamos la tabla con todos los modelos
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const models = await fetchModels();
-      setDataSource(models);
-    };
     fetchData();
   }, []);
 
   const handleAddModel = () => {
-    alert("Agregar nuevo modelo");
+    setModelToEdit(undefined);  // Restablecer el modelo a editar
+    setIsModalOpen(true);
   };
 
   const handleEdit = (modelId: number) => {
-    alert(`Editar modelo con ID: ${modelId}`);
+    const model = dataSource.find((model) => model.modelId === modelId);
+    if (model) {
+      setModelToEdit(model);  // Asignar el modelo para editar
+      setIsModalOpen(true);
+    }
   };
 
   const handleDelete = (modelId: number) => {
-    alert(`Eliminar modelo con ID: ${modelId}`);
+    Modal.confirm({
+      title: "Confirmar Eliminación",
+      content: "Se va a eliminar este registro. ¿Estás seguro?",
+      okText: "Sí",
+      cancelText: "No",
+      onOk: async () => {
+        try {
+          await deleteModel(modelId);
+          message.success("¡Eliminado correctamente!");
+          fetchData();
+        } catch (error) {
+          message.error("No se pudo eliminar el modelo.");
+        }
+      },
+    });
   };
 
-  const handleInfo = (modelId: number) => {
-    alert(`Mostrar información del modelo con ID: ${modelId}`);
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.toLowerCase();
+    setSearchTerm(value);
+
+    if (value === "") {
+      // Si la búsqueda está vacía, restauramos todos los modelos
+      setDataSource(allModels);
+    } else {
+      // Si hay un término de búsqueda, filtramos los modelos
+      setDataSource(
+        allModels.filter(
+          (item) =>
+            item.modelName.toLowerCase().includes(value) ||
+            item.brand.brandName.toLowerCase().includes(value)
+        )
+      );
+    }
   };
 
   const columns = [
@@ -50,7 +91,7 @@ const ModelManagement = () => {
     },
     {
       title: "Marca",
-      dataIndex: ["brand", "brandName"], // Accede al nombre de la marca
+      dataIndex: ["brand", "brandName"],
       key: "brandName",
     },
     {
@@ -74,52 +115,38 @@ const ModelManagement = () => {
             title="Eliminar"
             style={{ color: "red" }}
           />
-          <Button
-            icon={<InfoCircleOutlined />}
-            onClick={() => handleInfo(record.modelId)}
-            shape="circle"
-            size="small"
-            title="Información"
-            style={{ color: "green" }}
-          />
         </Space>
       ),
     },
   ];
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.toLowerCase();
-    setSearchTerm(value);
-    setDataSource((prevData) =>
-      prevData.filter((item) =>
-        item.modelName.toLowerCase().includes(value) ||
-        item.brand.brandName.toLowerCase().includes(value)
-      )
-    );
-  };
-
   return (
-    <div style={{ padding: "20px", backgroundColor: "white", fontFamily: "Arial, sans-serif" }}>
-      <h1 style={{ fontFamily: "Arial, sans-serif", fontSize: "30px" }}>Alquiler de Vehículos</h1>
-      <h2 style={{ fontFamily: "Arial, sans-serif", fontSize: "24px" }}>Administración de Modelos</h2>
+    <div style={{ padding: "20px", backgroundColor: "white" }}>
+      <h1>Alquiler de Vehículos</h1>
+      <h2>Administración de Modelos</h2>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
         <Input.Search
           placeholder="Buscar modelos"
           onChange={handleSearch}
           value={searchTerm}
           style={{ width: "300px" }}
-          enterButton
         />
         <Button
           icon={<PlusCircleOutlined />}
           type="primary"
           onClick={handleAddModel}
-          style={{ marginLeft: "10px" }}
         >
           Añadir Modelo
         </Button>
       </div>
       <Table dataSource={dataSource} columns={columns} rowKey="modelId" />
+      {/* Modal para crear o editar un modelo */}
+      <NewModelModal
+        isOpen={isModalOpen}
+        setIsOpen={setIsModalOpen}
+        reloadModels={fetchData}
+        modelToEdit={modelToEdit}  // Ahora modelToEdit es de tipo `Model | undefined`
+      />
     </div>
   );
 };
