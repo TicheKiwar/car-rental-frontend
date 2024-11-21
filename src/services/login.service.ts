@@ -5,7 +5,15 @@ export const login = async (values: any) => {
         const response = await api.post('/auth/login', values);
         return response.data;
     } catch (error) {
-        console.error("Error al crear el empleado:", error);
+        console.error("Error al iniciar sesión:", error);
         throw error;
     }
 };
+
+export const forgotPasswordEmail = async (email: string) => {
+    await api.post(`/auth/recover-password`, { email });
+}
+
+export const recoverPassword = async (token: string, newPassword: string) => {
+    await api.post(`/auth/reset-password`, { token, newPassword });
+}
