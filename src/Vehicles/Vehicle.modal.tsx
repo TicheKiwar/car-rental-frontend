@@ -188,8 +188,8 @@ const NewVehicleModal = ({
               rules={[{ required: true, message: "Seleccione el estado del vehículo" }]}
             >
               <Select>
-                <Option value="Available">Available</Option>
-                <Option value="Unavailable">Unavailable</Option>
+                <Option value="Available">Disponible</Option>
+                <Option value="Unavailable">No Disponible</Option>
               </Select>
             </Form.Item>
             <Form.Item
@@ -231,9 +231,9 @@ const NewVehicleModal = ({
             >
               <Select>
                 <Option value="Manual">Manual</Option>
-                <Option value="Automatic">Automatic</Option>
-                <Option value="Semi-Automatic">Semi-Automatic</Option>
-                <Option value="Dual-Clutch">Dual-Clutch</Option>
+                <Option value="Automatic">Automatica</Option>
+                <Option value="Semi-Automatic">Semi-Automatica</Option>
+                <Option value="Dual-Clutch">Doble Embrague</Option>
               </Select>
             </Form.Item>
             <Form.Item
@@ -249,10 +249,10 @@ const NewVehicleModal = ({
               rules={[{ required: true, message: "Seleccione el tipo de combustible" }]}
             >
               <Select>
-                <Option value="Gasoline">Gasoline</Option>
+                <Option value="Gasoline">Gasolina</Option>
                 <Option value="Diesel">Diesel</Option>
-                <Option value="Electricity">Electricity</Option>
-                <Option value="Hybrid">Hybrid</Option>
+                <Option value="Electricity">Electrico</Option>
+                <Option value="Hybrid">Hibrido</Option>
               </Select>
             </Form.Item>
             <Form.Item

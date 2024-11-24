@@ -58,7 +58,6 @@ const VehicleManagement = () => {
         );
         setAllVehicles(updatedVehicles);
         setTableData(updatedVehicles);
-        message.success("Vehículo eliminado exitosamente.");
       } catch (error) {
         message.error("Error al eliminar el vehículo.");
       }
@@ -112,29 +111,26 @@ const VehicleManagement = () => {
     },
     {
       title: "Imagen",
-      dataIndex: "image",
       key: "image",
-      render: (_: any, vehicle: Vehicle) => {
-        const brandName = vehicle.model?.brand?.brandName || "Sin marca";
-        const modelName = vehicle.model?.modelName || "Sin modelo";
-        const imageUrl = `/images/vehicles/${vehicle.licensePlate}-${modelName}-${brandName}.jpg`;
+      render: (text, record) => {
+        // Ruta de la imagen
+        const imageUrl = record.image
+          ? `http://localhost:5173${record.image}` // Si existe una imagen personalizada
+          : `http://localhost:5173/images/vehicles/default.jpg`; // Imagen por defecto
+  
         return (
           <img
             src={imageUrl}
-            alt="Vehículo"
-            onError={(e) => {
-              e.currentTarget.src = "images/vehicles/default.jpg"; // Imagen por defecto
-            }}
+            alt={record.licensePlate}
             style={{
-              width: "50px",
-              height: "50px",
-              objectFit: "cover",
-              borderRadius: "4px",
+              width: "100px",  // Ancho ajustado para que se vea bien
+              height: "100px", // Altura ajustada para que se vea bien
+              objectFit: "cover", // Asegura que la imagen no se deforme
+              borderRadius: "4px", // Bordes redondeados opcionales
             }}
           />
         );
       },
-      
     },
     {
       title: "Tipo",

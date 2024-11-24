@@ -16,7 +16,6 @@ const fetchVehicles = async (): Promise<Vehicle[]> => {
     key: vehicle.vehicleId,
     brand: vehicle.model.brand.brandName,
     model: vehicle.model.modelName,
-    image: "", // Puedes ajustar esto según tu lógica
   }));
 };
 
@@ -25,8 +24,6 @@ const fetchModels = async (): Promise<VehicleModel[]> => {
   try {
     const response = await axios.get(`${API_URL}/model`);
     const data = response.data;
-
-    // Asegúrate de incluir todos los campos de la interfaz VehicleModel, incluyendo deletedAt
     return data.map((model: any) => ({
       modelId: model.modelId,
       modelName: model.modelName,
