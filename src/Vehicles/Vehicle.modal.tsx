@@ -1,6 +1,12 @@
-import React, { useState } from "react";
-import { Modal, Form, Input, Button, Upload, message, Row, Col } from "antd";
+import React, { useState, useEffect } from "react";
+import { Modal, Form, Input, Button, Upload, message, Row, Col, Select, DatePicker } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
+import { VehicleModel } from "./Ivehicle";
+import { fetchModels } from "./vehicle.service";
+import { createVehicle } from "./vehicle.service";  // Asegúrate de tener la función para crear el vehículo
+import axios from "axios";
+
+const { Option } = Select;
 
 const NewVehicleModal = ({
   visible,
@@ -14,6 +20,21 @@ const NewVehicleModal = ({
   const [form] = Form.useForm();
   const [isDirty, setIsDirty] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [models, setModels] = useState<VehicleModel[]>([]);
+  const [selectedModel, setSelectedModel] = useState<VehicleModel | null>(null);
+  const API_URL = "http://localhost:3000";
+
+  useEffect(() => {
+    if (visible) {
+      fetchModels()
+        .then((response) => {
+          setModels(response);
+        })
+        .catch(() => {
+          message.error("Error al cargar los modelos de autos");
+        });
+    }
+  }, [visible]);
 
   const handleFileChange = (info: any) => {
     const { file } = info;
@@ -39,28 +60,72 @@ const NewVehicleModal = ({
     }
   };
 
-  const handleSave = () => {
-    form
-      .validateFields()
-      .then((values) => {
+  const handleSave = async () => {
+    if (!selectedModel) {
+      message.error("Debe seleccionar un modelo de vehículo");
+      return;
+    }
+  
+    form.validateFields().then(async (values) => {
+      if (!imageFile) {
+        message.error("Debe subir una imagen");
+        return;
+      }
+  
+      try {
+        // Crear un FormData para enviar el archivo de imagen al backend
+        const formData = new FormData();
+        formData.append("file", imageFile);  // Enviar el archivo de imagen
+        formData.append("licensePlate", values.licensePlate);  // Enviar otros datos necesarios
+        formData.append("model", selectedModel.modelName);     // Nombre del modelo
+        formData.append("brand", selectedModel.brand.brandName);  // Nombre de la marca
+  
+        // Subir la imagen al backend
+        const uploadResponse = await axios.post(`${API_URL}/upload`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+  
+        // Obtener la ruta de la imagen de la respuesta
+        const imagePath = uploadResponse.data.imagePath;
+  
+        // Crear el objeto de datos del vehículo
         const vehicleData = {
           ...values,
-          image: imageFile,
+          image: imagePath, // Incluir la ruta de la imagen, no el archivo
+          modelId: selectedModel?.modelId,
+          capacity: Number(values.capacity),
+          maxSpeed: Number(values.maxSpeed),
+          mileage: Number(values.mileage),
+          doorCount: Number(values.doorCount),
+          dailyRate: String(values.dailyRate),
+          costDayDelay: String(values.costDayDelay),
+          lastRevisionDate: values.lastRevisionDate?.format("YYYY-MM-DD"),
+          registrationDate: values.registrationDate?.format("YYYY-MM-DD"),
         };
-        onSave(vehicleData);
-        message.success("Auto guardado exitosamente");
+  
+        console.log(vehicleData);
+        // Enviar los datos del vehículo al backend
+        await createVehicle(vehicleData);
+        message.success("Vehículo guardado exitosamente");
         form.resetFields();
         setImageFile(null);
-        setIsDirty(false);
+        setSelectedModel(null);
         onClose();
-      })
-      .catch(() => {
-        message.error("No se guardó el auto. Verifique los campos.");
-      });
+      } catch (error) {
+        message.error("Error al guardar el vehículo o la imagen");
+      }
+    });
   };
+  
+  
 
   const handleValuesChange = () => {
     setIsDirty(true);
+  };
+
+  const handleModelChange = (value: any) => {
+    const model = models.find((model) => model.modelId === value);
+    setSelectedModel(model || null);
   };
 
   return (
@@ -100,6 +165,7 @@ const NewVehicleModal = ({
         }}
       >
         <Row gutter={16}>
+          {/* Columna 1 */}
           <Col span={12}>
             <Form.Item label="Imagen" valuePropName="file">
               <Upload
@@ -122,16 +188,26 @@ const NewVehicleModal = ({
             <Form.Item
               label="Tipo"
               name="type"
-              rules={[{ required: true, message: "Ingrese el tipo" }]}
+              rules={[{ required: true, message: "Ingrese el tipo de vehículo" }]}
             >
               <Input />
             </Form.Item>
             <Form.Item
               label="Estado"
               name="status"
-              rules={[{ required: true, message: "Ingrese el estado" }]}
+              rules={[{ required: true, message: "Seleccione el estado del vehículo" }]}
             >
-              <Input />
+              <Select>
+                <Option value="Available">Disponible</Option>
+                <Option value="Unavailable">No Disponible</Option>
+              </Select>
+            </Form.Item>
+            <Form.Item
+              label="Tarifa diaria"
+              name="dailyRate"
+              rules={[{ required: true, message: "Ingrese la tarifa diaria" }]}
+            >
+              <Input type="number" />
             </Form.Item>
             <Form.Item
               label="Capacidad"
@@ -150,25 +226,25 @@ const NewVehicleModal = ({
             <Form.Item
               label="Color"
               name="color"
-              rules={[{ required: true, message: "Ingrese el color" }]}
+              rules={[{ required: true, message: "Ingrese el color del vehículo" }]}
             >
               <Input />
             </Form.Item>
           </Col>
+
+          {/* Columna 2 */}
           <Col span={12}>
-            <Form.Item
-              label="Precio por día"
-              name="dailyRate"
-              rules={[{ required: true, message: "Ingrese el precio por día" }]}
-            >
-              <Input />
-            </Form.Item>
             <Form.Item
               label="Transmisión"
               name="transmission"
-              rules={[{ required: true, message: "Ingrese la transmisión" }]}
+              rules={[{ required: true, message: "Seleccione la transmisión" }]}
             >
-              <Input />
+              <Select>
+                <Option value="Manual">Manual</Option>
+                <Option value="Automatic">Automatica</Option>
+                <Option value="Semi-Automatic">Semi-Automatica</Option>
+                <Option value="Dual-Clutch">Doble Embrague</Option>
+              </Select>
             </Form.Item>
             <Form.Item
               label="Número de puertas"
@@ -180,9 +256,14 @@ const NewVehicleModal = ({
             <Form.Item
               label="Tipo de combustible"
               name="fuelType"
-              rules={[{ required: true, message: "Ingrese el tipo de combustible" }]}
+              rules={[{ required: true, message: "Seleccione el tipo de combustible" }]}
             >
-              <Input />
+              <Select>
+                <Option value="Gasoline">Gasolina</Option>
+                <Option value="Diesel">Diesel</Option>
+                <Option value="Electricity">Electrico</Option>
+                <Option value="Hybrid">Hibrido</Option>
+              </Select>
             </Form.Item>
             <Form.Item
               label="Kilometraje"
@@ -194,25 +275,40 @@ const NewVehicleModal = ({
             <Form.Item
               label="Fecha de última revisión"
               name="lastRevisionDate"
-              rules={[
-                { required: true, message: "Ingrese la fecha de última revisión" },
-              ]}
+              rules={[{ required: true, message: "Ingrese la fecha de última revisión" }]}
             >
-              <Input type="date" />
+              <DatePicker style={{ width: "100%" }} />
             </Form.Item>
             <Form.Item
               label="Fecha de registro"
               name="registrationDate"
               rules={[{ required: true, message: "Ingrese la fecha de registro" }]}
             >
-              <Input type="date" />
+              <DatePicker style={{ width: "100%" }} />
             </Form.Item>
             <Form.Item
               label="Costo por día de retraso"
               name="costDayDelay"
               rules={[{ required: true, message: "Ingrese el costo por día de retraso" }]}
             >
-              <Input />
+              <Input type="number" />
+            </Form.Item>
+            <Form.Item
+              label="Modelo"
+              name="modelId"
+              rules={[{ required: true, message: "Seleccione un modelo" }]}
+            >
+              <Select
+                placeholder="Seleccione un modelo"
+                onChange={handleModelChange}
+                value={selectedModel ? selectedModel.modelId : undefined}
+              >
+                {models.map((model) => (
+                  <Option key={model.modelId} value={model.modelId}>
+                    {model.modelName}
+                  </Option>
+                ))}
+              </Select>
             </Form.Item>
           </Col>
         </Row>
