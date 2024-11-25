@@ -15,13 +15,13 @@ function App() {
       <Routes>
         {/* Ruta pública para login */}
         <Route path="/" element={<Login />} />
-        
+        <Route path="/register" element={<RegistrationForm />} />
+          <Route path="/password_reset" element={<ForgotPassword />} />
+          <Route path="/reset_password/:token" element={<ResetPassword />} />
+
         {/* Rutas protegidas dentro del MainLayout */}
         <Route element={<MainLayout />}>
           <Route path="/home" element={<Home />} />
-          <Route path="/register" element={<RegistrationForm />} />
-          <Route path="/password_reset" element={<ForgotPassword />} />
-          <Route path="/reset_password/:token" element={<ResetPassword />} />
           <Route path="/vehicle-management" element={<VehicleManagement />} />
           <Route path="/model-management" element={<ModelManagement />} />
         </Route>

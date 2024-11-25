@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Card, Col, Row, Modal, Button, Input, Select } from "antd";
-import { VehicleType } from "../../common/vehicle.type";
-import { fetchData, getData } from "../../services/catalog.service";
+import { VehicleType } from "../common/vehicle.type";
+import { fetchData, getData } from "../services/catalog.service";
+import { url } from "../services/api.service";
 
 const { Meta } = Card;
 const { Option } = Select;
@@ -111,8 +112,8 @@ const VehicleCatalog: React.FC = () => {
       {/* Catálogo de Vehículos */}
       <Row gutter={[16, 16]}>
         {filteredVehicles.map((vehicle) => {
-          const imageUrl = `/images/vehicles/${vehicle.licensePlate}-${vehicle.model.name}-${vehicle.model.brand.name}.jpg`;
-
+          const imageUrl = `${url}/${vehicle.image}`;
+          console.log(imageUrl)
           return (
             <Col span={6} key={vehicle.vehicleId}>
               <Card
@@ -122,7 +123,7 @@ const VehicleCatalog: React.FC = () => {
                     alt="Vehicle"
                     src={imageUrl}
                     onError={(e) => {
-                      e.currentTarget.src = "/images/vehicles/default.jpg";
+                      e.currentTarget.src = `${url}/images/vehicles/default.jpg`;
                     }}
                     style={{
                       width: "100%",

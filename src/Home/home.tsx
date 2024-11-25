@@ -1,9 +1,9 @@
 import React from "react";
 import Menu from "./menu";
-import VehicleCatalog from "../catalog/components/catalog";
 import "./home.css";
 import Sidebar from "./sideBar";
 import { Layout } from "antd";
+import VehicleCatalog from "../catalog/catalog";
 
 const { Content, Footer } = Layout;
 
