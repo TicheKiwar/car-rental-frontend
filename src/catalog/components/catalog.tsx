@@ -100,7 +100,7 @@ const VehicleCatalog: React.FC = () => {
     };
     return (
       <Option key={status} value={status}>
-        {statusMap[status] || "Estado desconocido"}
+        {statusMap[status!] || "Estado desconocido"}
       </Option>
     );
   })}
@@ -111,7 +111,9 @@ const VehicleCatalog: React.FC = () => {
       {/* Catálogo de Vehículos */}
       <Row gutter={[16, 16]}>
         {filteredVehicles.map((vehicle) => {
-          const imageUrl = `/images/vehicles/${vehicle.licensePlate}-${vehicle.model.name}-${vehicle.model.brand.name}.jpg`;
+          const imageUrl = vehicle.image
+          ? `${vehicle.image}`
+          : `http://localhost:3000/images/vehicles/default.jpg`;
 
           return (
             <Col span={6} key={vehicle.vehicleId}>
@@ -121,9 +123,6 @@ const VehicleCatalog: React.FC = () => {
                   <img
                     alt="Vehicle"
                     src={imageUrl}
-                    onError={(e) => {
-                      e.currentTarget.src = "/images/vehicles/default.jpg";
-                    }}
                     style={{
                       width: "100%",
                       height: "150px",
