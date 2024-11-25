@@ -21,6 +21,7 @@ async function fetchData(): Promise<void> {
       transmission: item.transmission ?? "Manual",
       doorCount: item.doorCount ?? 4,
       fuelType: item.fuelType ?? "Gasoline",
+      image: item.image,
       model: {
         modelId: item.model.modelId,
         name: item.model.modelName ?? "Unknown model",
