@@ -126,7 +126,7 @@ const VehicleManagement = () => {
       key: "image",
       render: (_: any, record) => {
         const imageUrl = record.image
-          ? `${record.image}?timestamp=${new Date().getTime()}`
+          ? `${record.image}`
           : `http://localhost:3000/images/vehicles/default.jpg`;
 
         return (

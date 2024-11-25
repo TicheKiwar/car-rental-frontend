@@ -16,7 +16,7 @@ const VehicleInfoModal: React.FC<VehicleInfoModalProps> = ({
   if (!vehicle) return null;
 
   const imageUrl = vehicle.image
-    ? `${vehicle.image}`
+            ? `${vehicle.image}`
     : `http://localhost:3000/images/vehicles/default.jpg`;
 
   return (

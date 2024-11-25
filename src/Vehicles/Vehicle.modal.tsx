@@ -17,6 +17,7 @@ import { Vehicle, VehicleModel } from "./Ivehicle";
 import { supabase } from "../services/client-supabase.service";
 import moment from "moment";
 import { createVehicle, fetchModels, updateVehicle } from "../services/vehicle.service";
+import { v4 as uuidv4 } from "uuid";
 
 const { Option } = Select;
 
@@ -124,11 +125,12 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
 
         if (error) throw new Error("Error al cargar la imagen");
 
+        const imageToken = uuidv4();
         const { data: publicUrlData } = supabase.storage
           .from("images-vehicles")
           .getPublicUrl(`vehicles/${values.licensePlate || vehicle?.licensePlate}`);
 
-        imageUrl = publicUrlData.publicUrl;
+        imageUrl = `${publicUrlData.publicUrl}?v=${imageToken}`;
       }
       
       const vehicleData = {
