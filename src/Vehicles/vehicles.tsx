@@ -5,13 +5,13 @@ import {
   EditOutlined,
   DeleteOutlined,
   InfoCircleOutlined,
-  HomeOutlined, // Importa el icono de la casa
+  HomeOutlined,
 } from "@ant-design/icons";
-import { fetchVehicles, deleteVehicle } from "./vehicle.service";
 import { Vehicle } from "./Ivehicle";
 import VehicleInfoModal from "./VehicleInfo.modal";
 import NewVehicleModal from "./Vehicle.modal";
-import { Link } from "react-router-dom"; // Importa el Link de react-router-dom
+import { Link } from "react-router-dom";
+import { deleteVehicle, fetchVehicles } from "../services/vehicle.service";
 
 const VehicleManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -34,16 +34,29 @@ const VehicleManagement = () => {
 
   const handleSaveVehicle = async (vehicleData: any) => {
     try {
-      const vehicles = await fetchVehicles();
-      setAllVehicles(vehicles);
-      setTableData(vehicles);
+      const updatedVehicles = await fetchVehicles();
+      setAllVehicles(updatedVehicles);
+      setTableData(updatedVehicles);
     } catch (error) {
-      message.error("Error al actualizar la lista de vehículos");
+      message.error("Error al guardar los datos del vehículo");
+    } finally {
+      setIsNewVehicleModalVisible(false);
+      setSelectedVehicle(null);
+    }
+  };
+  
+
+  const handleEdit = (vehicleId: number) => {
+    const vehicleToEdit = allVehicles.find((vehicle) => vehicle.vehicleId === vehicleId);
+    if (vehicleToEdit) {
+      setSelectedVehicle(vehicleToEdit);
+      setIsNewVehicleModalVisible(true);
     }
   };
 
-  const handleEdit = (vehicleId: number) => {
-    alert(`Editar vehículo con ID: ${vehicleId}`);
+  const handleAddVehicle = () => {
+    setSelectedVehicle(null);
+    setIsNewVehicleModalVisible(true);
   };
 
   const handleDelete = (vehicleId: number) => {
@@ -60,6 +73,7 @@ const VehicleManagement = () => {
         );
         setAllVehicles(updatedVehicles);
         setTableData(updatedVehicles);
+        message.success("Vehículo eliminado correctamente");
       } catch (error) {
         message.error("Error al eliminar el vehículo.");
       }
@@ -84,10 +98,6 @@ const VehicleManagement = () => {
     setSelectedVehicle(null);
   };
 
-  const handleAddVehicle = () => {
-    setIsNewVehicleModalVisible(true);
-  };
-
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.toLowerCase();
     setSearchTerm(value);
@@ -107,28 +117,27 @@ const VehicleManagement = () => {
 
   const columns = [
     {
-      title: "No.",
-      dataIndex: "vehicleId",
-      key: "vehicleId",
+      title: "Placa",
+      dataIndex: "licensePlate",
+      key: "licensePlate",
     },
     {
       title: "Imagen",
       key: "image",
-      render: (text, record) => {
-        // Ruta de la imagen
+      render: (_: any, record) => {
         const imageUrl = record.image
-          ? `http://localhost:3000${record.image}` // Si existe una imagen personalizada
-          : `http://localhost:3000/images/vehicles/default.jpg`; // Imagen por defecto
-  
+          ? `${record.image}?timestamp=${new Date().getTime()}`
+          : `http://localhost:3000/images/vehicles/default.jpg`;
+
         return (
           <img
             src={imageUrl}
             alt={record.licensePlate}
             style={{
-              width: "100px",  // Ancho ajustado para que se vea bien
-              height: "100px", // Altura ajustada para que se vea bien
-              objectFit: "cover", // Asegura que la imagen no se deforme
-              borderRadius: "4px", // Bordes redondeados opcionales
+              width: "140px",
+              height: "auto",
+              objectFit: "cover",
+              borderRadius: "4px",
             }}
           />
         );
@@ -141,12 +150,12 @@ const VehicleManagement = () => {
     },
     {
       title: "Marca",
-      dataIndex: "brand",
+      dataIndex: ["model", "brand", "brandName"],
       key: "brand",
     },
     {
       title: "Modelo",
-      dataIndex: "model",
+      dataIndex: ["model", "modelName"],
       key: "model",
     },
     {
@@ -196,11 +205,10 @@ const VehicleManagement = () => {
   return (
     <div style={{ padding: "20px", backgroundColor: "white", position: "relative" }}>
       <h1>Administración de Vehículos</h1>
-      
-      {/* Botón para redirigir a la ruta "/home" con un icono de casa */}
+
       <Link to="/home">
         <Button
-          icon={<HomeOutlined />} // Usamos el icono HomeOutlined de Ant Design
+          icon={<HomeOutlined />}
           shape="circle"
           style={{
             position: "absolute",
@@ -236,13 +244,14 @@ const VehicleManagement = () => {
         vehicle={selectedVehicle}
       />
       <NewVehicleModal
-        visible={isNewVehicleModalVisible}
         onClose={() => setIsNewVehicleModalVisible(false)}
+        visible={isNewVehicleModalVisible}
         onSave={handleSaveVehicle}
+        vehicle={selectedVehicle}
       />
       <Modal
         title="Confirmación"
-        visible={isConfirmDeleteModalVisible}
+        open={isConfirmDeleteModalVisible}
         onOk={confirmDelete}
         onCancel={cancelDelete}
         okText="Sí"

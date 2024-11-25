@@ -3,12 +3,14 @@ export interface VehicleModel {
   modelName: string;
   year: number;
   deletedAt: string | null;
-  brand: {
-    brandId: number;
-    brandName: string;
-    deletedAt: string | null;
-  };
+  brand: IBrand
 }
+
+export interface IBrand{
+  brandId: number;
+  brandName: string;
+  deletedAt: string | null;
+};
 
 export interface Vehicle {
   key: number;

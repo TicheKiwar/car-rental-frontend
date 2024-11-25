@@ -5,7 +5,7 @@ import { Vehicle } from "./Ivehicle";
 interface VehicleInfoModalProps {
   visible: boolean;
   onClose: () => void;
-  vehicle: Vehicle | null; // Puede ser nulo si no hay vehículo seleccionado.
+  vehicle: Vehicle | null;
 }
 
 const VehicleInfoModal: React.FC<VehicleInfoModalProps> = ({
@@ -13,41 +13,47 @@ const VehicleInfoModal: React.FC<VehicleInfoModalProps> = ({
   onClose,
   vehicle,
 }) => {
-  if (!vehicle) return null; // Si no hay vehículo, no muestra nada.
+  if (!vehicle) return null;
 
-  // Generar la URL de la imagen
   const imageUrl = vehicle.image
-    ? `http://localhost:3000${vehicle.image}` // Si existe una imagen personalizada
-    : `http://localhost:3000/images/vehicles/default.jpg`; // Imagen por defecto
+    ? `${vehicle.image}`
+    : `http://localhost:3000/images/vehicles/default.jpg`;
 
   return (
     <Modal
-      title={`Información del Vehículo : ${vehicle.type}, ${vehicle.model}`}
+      title={`Información del Vehículo : ${vehicle.licensePlate}`}
       visible={visible}
       onCancel={onClose}
       footer={null}
       width={900}
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        {/* Imagen del vehículo */}
         <div style={{ width: "35%", height: "200px", backgroundColor: "#f0f0f0", borderRadius: "8px" }}>
           <img
             src={imageUrl}
             alt={vehicle.licensePlate}
             style={{
-              width: "100%",  // Se ajusta para llenar el espacio disponible
-              height: "100%", // Se ajusta para llenar el espacio disponible
-              objectFit: "cover", // Asegura que la imagen no se deforme
-              borderRadius: "8px", // Bordes redondeados para la imagen
+              width: "300px",
+              height: "auto",
+              objectFit: "cover",
+              borderRadius: "8px",
             }}
           />
         </div>
 
-        {/* Descripción del vehículo */}
         <div style={{ width: "60%" }}>
           <Descriptions column={1} bordered>
-            <Descriptions.Item label="Matrícula">
-              {vehicle.licensePlate}
+            <Descriptions.Item label="Modelo">
+             {vehicle.model.brand.brandName} {vehicle.model.modelName} ({vehicle.model.year})
+            </Descriptions.Item>
+            <Descriptions.Item label="Tipo">
+             {vehicle.type}
+            </Descriptions.Item>
+            <Descriptions.Item label="Tarifa Diaria">
+             ${vehicle.dailyRate}
+            </Descriptions.Item>
+            <Descriptions.Item label="Costo por Día de Retraso">
+              ${vehicle.costDayDelay}
             </Descriptions.Item>
             <Descriptions.Item label="Transmisión">
               {vehicle.transmission}
@@ -72,9 +78,6 @@ const VehicleInfoModal: React.FC<VehicleInfoModalProps> = ({
             </Descriptions.Item>
             <Descriptions.Item label="Fecha de Registro">
               {vehicle.registrationDate}
-            </Descriptions.Item>
-            <Descriptions.Item label="Costo por Día de Retraso">
-              ${vehicle.costDayDelay}
             </Descriptions.Item>
           </Descriptions>
         </div>
