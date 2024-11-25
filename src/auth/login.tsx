@@ -28,8 +28,6 @@ const Login: React.FC = () => {
             navigate("/home");
           } if (dataUser.data.role.roleId === 1) {
             navigate("/vehicle-management");
-          } else {
-            message.warning("No tienes acceso como cliente.");
           }
         }
       }
