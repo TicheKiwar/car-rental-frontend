@@ -1,23 +1,38 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-
-
+import React from "react";
 import Menu from "./menu";
-import VehicleCatalog from "../catalog/components/catalog";
+import "./home.css";
+import Sidebar from "./sideBar";
+import { Layout } from "antd";
+import VehicleCatalog from "../catalog/catalog";
+
+const { Content, Footer } = Layout;
 
 const Home: React.FC = () => {
+  const handleLogout = () => {
+    console.log('Cerrar sesión'); // Aquí puedes integrar tu lógica de logout
+  };
+
+  const userRole = 'employee'; // Cambiar dinámicamente según el rol del usuario
 
   return (
-    <div className="flex h-screen">
-      <div className="w-1/4 p-4 bg-gray-200">
-        <Menu />
-      </div>
-      <div className="flex-grow flex flex-col items-center p-4">
-        <div className="w-2/3 min-h-[809px]">
-          <VehicleCatalog />
-        </div>
-      </div>
-    </div>
+        <Content>
+          <div className="home-container">
+            {/* Header */}
+            <header className="home-header">
+              <h1 className="home-title">Alquiler de Vehículos Ecuador</h1>
+              <nav className="home-breadcrumb">
+                <a href="/">Ubicaciones</a> &gt;
+                <a href="/latin-america"> Latin America</a> &gt;
+                <span>Ecuador</span>
+              </nav>
+            </header>
+
+            {/* Main Content */}
+            <div>
+              <VehicleCatalog />
+            </div>
+          </div>
+        </Content>
   );
 };
 

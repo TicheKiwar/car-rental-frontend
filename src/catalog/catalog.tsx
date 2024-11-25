@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Card, Col, Row, Modal, Button, Input, Select } from "antd";
-import { VehicleType } from "../../common/vehicle.type";
-import { fetchData, getData } from "../../services/catalog.service";
+import { VehicleType } from "../common/vehicle.type";
+import { fetchData, getData } from "../services/catalog.service";
 
 const { Meta } = Card;
 const { Option } = Select;

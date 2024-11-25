@@ -18,20 +18,16 @@ const Login: React.FC = () => {
       const { data }: { data: any } = await login(values);
       localStorage.setItem("authToken", data.accessToken);
       const userId = getUserId();
-
       if (userId != null) {
         const dataUser: any = await getUserById(userId);
         console.log(dataUser.data.role);
-
+        localStorage.setItem("userRole",JSON.stringify(dataUser.data.role))
         if (dataUser) {
           message.success("Inicio de sesión exitoso");
           if (dataUser.data.role.roleId === 3) {
             navigate("/home");
-          } else if (dataUser.data.role.roleId === 1) {
-            navigate("/menu ");
-          }
-           else {
-            return
+          } if (dataUser.data.role.roleId === 1) {
+            navigate("/vehicle-management");
           }
         }
       }
