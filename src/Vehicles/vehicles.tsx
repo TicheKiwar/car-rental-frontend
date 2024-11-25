@@ -5,11 +5,13 @@ import {
   EditOutlined,
   DeleteOutlined,
   InfoCircleOutlined,
+  HomeOutlined, // Importa el icono de la casa
 } from "@ant-design/icons";
 import { fetchVehicles, deleteVehicle } from "./vehicle.service";
 import { Vehicle } from "./Ivehicle";
 import VehicleInfoModal from "./VehicleInfo.modal";
 import NewVehicleModal from "./Vehicle.modal";
+import { Link } from "react-router-dom"; // Importa el Link de react-router-dom
 
 const VehicleManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -58,7 +60,6 @@ const VehicleManagement = () => {
         );
         setAllVehicles(updatedVehicles);
         setTableData(updatedVehicles);
-        message.success("Vehículo eliminado exitosamente.");
       } catch (error) {
         message.error("Error al eliminar el vehículo.");
       }
@@ -112,29 +113,26 @@ const VehicleManagement = () => {
     },
     {
       title: "Imagen",
-      dataIndex: "image",
       key: "image",
-      render: (_: any, vehicle: Vehicle) => {
-        const brandName = vehicle.model?.brand?.brandName || "Sin marca";
-        const modelName = vehicle.model?.modelName || "Sin modelo";
-        const imageUrl = `/images/vehicles/${vehicle.licensePlate}-${modelName}-${brandName}.jpg`;
+      render: (text, record) => {
+        // Ruta de la imagen
+        const imageUrl = record.image
+          ? `http://localhost:3000${record.image}` // Si existe una imagen personalizada
+          : `http://localhost:3000/images/vehicles/default.jpg`; // Imagen por defecto
+  
         return (
           <img
             src={imageUrl}
-            alt="Vehículo"
-            onError={(e) => {
-              e.currentTarget.src = "images/vehicles/default.jpg"; // Imagen por defecto
-            }}
+            alt={record.licensePlate}
             style={{
-              width: "50px",
-              height: "50px",
-              objectFit: "cover",
-              borderRadius: "4px",
+              width: "100px",  // Ancho ajustado para que se vea bien
+              height: "100px", // Altura ajustada para que se vea bien
+              objectFit: "cover", // Asegura que la imagen no se deforme
+              borderRadius: "4px", // Bordes redondeados opcionales
             }}
           />
         );
       },
-      
     },
     {
       title: "Tipo",
@@ -196,8 +194,25 @@ const VehicleManagement = () => {
   ];
 
   return (
-    <div style={{ padding: "20px", backgroundColor: "white" }}>
+    <div style={{ padding: "20px", backgroundColor: "white", position: "relative" }}>
       <h1>Administración de Vehículos</h1>
+      
+      {/* Botón para redirigir a la ruta "/home" con un icono de casa */}
+      <Link to="/home">
+        <Button
+          icon={<HomeOutlined />} // Usamos el icono HomeOutlined de Ant Design
+          shape="circle"
+          style={{
+            position: "absolute",
+            top: 20,
+            right: 20,
+            borderColor: "transparent",
+            backgroundColor: "#ffffff",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          }}
+        />
+      </Link>
+
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
         <Input.Search
           placeholder="Buscar vehículos"
