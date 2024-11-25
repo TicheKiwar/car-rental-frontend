@@ -29,4 +29,5 @@ export interface Vehicle {
   costDayDelay: string;
   deletedAt: string | null;
   model: VehicleModel;
+  image: string;
 }

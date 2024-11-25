@@ -15,21 +15,31 @@ const VehicleInfoModal: React.FC<VehicleInfoModalProps> = ({
 }) => {
   if (!vehicle) return null; // Si no hay vehículo, no muestra nada.
 
+  // Generar la URL de la imagen
+  const imageUrl = vehicle.image
+    ? `http://localhost:3000${vehicle.image}` // Si existe una imagen personalizada
+    : `http://localhost:3000/images/vehicles/default.jpg`; // Imagen por defecto
+
   return (
     <Modal
-      title={`Información del Vehículo : ${vehicle.type}, ${vehicle.model} `}
+      title={`Información del Vehículo : ${vehicle.type}, ${vehicle.model}`}
       visible={visible}
       onCancel={onClose}
       footer={null}
       width={900}
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        {/* Espacio para la imagen */}
-        <div style={{ width: "20%" }}>
+        {/* Imagen del vehículo */}
+        <div style={{ width: "35%", height: "200px", backgroundColor: "#f0f0f0", borderRadius: "8px" }}>
           <img
-            src={vehicle.image || "/path/to/default/image.jpg"} // Imagen por defecto si no hay.
-            alt="Vehicle"
-            style={{ width: "100%", height: "auto", borderRadius: "8px" }}
+            src={imageUrl}
+            alt={vehicle.licensePlate}
+            style={{
+              width: "100%",  // Se ajusta para llenar el espacio disponible
+              height: "100%", // Se ajusta para llenar el espacio disponible
+              objectFit: "cover", // Asegura que la imagen no se deforme
+              borderRadius: "8px", // Bordes redondeados para la imagen
+            }}
           />
         </div>
 
