@@ -89,7 +89,7 @@ const VehicleCatalog: React.FC = () => {
           ))}
         </Select>
         <Select
-  placeholder="Filtrar por estado"
+  placeholder="Filtrar por estado"  
   allowClear
   onChange={(value) => handleStatusFilter(value || null)}
   style={{ width: "30%" }}
@@ -113,7 +113,6 @@ const VehicleCatalog: React.FC = () => {
       <Row gutter={[16, 16]}>
         {filteredVehicles.map((vehicle) => {
           const imageUrl = `${url}/${vehicle.image}`;
-          console.log(imageUrl)
           return (
             <Col span={6} key={vehicle.vehicleId}>
               <Card

@@ -5,31 +5,43 @@ import {
   UserOutlined,
   HomeOutlined,
   LogoutOutlined,
+  AppstoreAddOutlined,
 } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom'; 
 
 const { Sider } = Layout;
 
 interface SidebarProps {
-  role: string; // Rol del usuario (admin, employee, user)
-  onLogout: () => void; // Función para cerrar sesión
+  role: string; 
+  onLogout: () => void; 
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ role, onLogout }) => {
-  // Opciones del menú según el rol del usuario
+  const navigate = useNavigate(); 
+
+  if (!role) {
+    return <div>Cargando Sidebar...</div>;
+  }
+
   const menuOptions = {
-    admin: [
-      { key: 'autos', label: 'Gestión de Autos', icon: <CarOutlined /> },
-      { key: 'usuarios', label: 'Gestión de Usuarios', icon: <UserOutlined /> },
+    Administrador: [
+      { key: 'autos', label: 'Gestión de Autos', icon: <CarOutlined />, route: '/vehicle-management' },
+      { key: 'usuarios', label: 'Gestión de Usuarios', icon: <UserOutlined />, route: '/Home' },
+      { key: 'modelos', label: 'Gestión de Modelos', icon: <AppstoreAddOutlined />, route: '/model-management' },
     ],
     employee: [
-      { key: 'alquiler', label: 'Alquiler de Autos', icon: <CarOutlined /> },
+      { key: 'alquiler', label: 'Alquiler de Autos', icon: <CarOutlined />, route: '/Home' },
     ],
-    user: [
-      { key: 'catalogo', label: 'Catálogo', icon: <HomeOutlined /> },
+    Cliente: [
+      { key: 'catalogo', label: 'Catálogo', icon: <HomeOutlined />, route: '/Home' },
     ],
   };
 
   const options = menuOptions[role] || [];
+
+  const handleMenuClick = (route: string) => {
+    navigate(route); // Redirige a la ruta cuando se hace clic
+  };
 
   return (
     <Sider style={{ height: '100vh', position: 'fixed', left: 0 }}>
@@ -42,12 +54,12 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onLogout }) => {
         style={{
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'space-between', // Esto alinea los items del menú arriba y el logout abajo
+          justifyContent: 'space-between',
         }}
       >
         {/* Opciones principales */}
-        {options.map(({ key, label, icon }) => (
-          <Menu.Item key={key} icon={icon}>
+        {options.map(({ key, label, icon, route }) => (
+          <Menu.Item key={key} icon={icon} onClick={() => handleMenuClick(route)}>
             {label}
           </Menu.Item>
         ))}

@@ -1,22 +1,38 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "../Home/sideBar";
 import { Layout } from "antd";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import "./mainLayout.css";
 
 const { Header, Footer, Content } = Layout;
 
 const MainLayout: React.FC = () => {
+  const navigate = useNavigate();
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const userRole = localStorage.getItem("userRole");
+    if (userRole) {
+      setUser(JSON.parse(userRole));
+    } else {
+      navigate("/");
+    }
+  }, [navigate]);
+
   const handleLogout = () => {
-    console.log("Cerrar sesión"); // Lógica de logout aquí
+    localStorage.removeItem("userRole");
+    navigate("/");
   };
 
-  const userRole = "employee"; // Cambiar según el rol del usuario
+  if (!user) {
+    // Muestra un loader o nada mientras se cargan los datos
+    return <div>Cargando...</div>;  
+  }
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      {/* Sidebar */}
-      <Sidebar role={userRole} onLogout={handleLogout} />
+      {/* Renderiza Sidebar solo cuando los datos están listos */}
+      <Sidebar role={user.roleName} onLogout={handleLogout} />
 
       <Layout style={{ marginLeft: 200 }}>
         {/* Header */}
@@ -26,8 +42,9 @@ const MainLayout: React.FC = () => {
 
         {/* Contenido Principal */}
         <Content style={{ backgroundColor: "#f0f2f5" }}>
-          <Outlet /> {/* Renderiza aquí las rutas hijas */}
+          <Outlet />
         </Content>
+
         {/* Footer */}
         <Footer style={{ textAlign: "center", backgroundColor: "#f0f2f5" }}>
           <div className="home-footer-sections">

@@ -18,15 +18,16 @@ const Login: React.FC = () => {
       const { data }: { data: any } = await login(values);
       localStorage.setItem("authToken", data.accessToken);
       const userId = getUserId();
-
       if (userId != null) {
         const dataUser: any = await getUserById(userId);
         console.log(dataUser.data.role);
-
+        localStorage.setItem("userRole",JSON.stringify(dataUser.data.role))
         if (dataUser) {
           message.success("Inicio de sesión exitoso");
           if (dataUser.data.role.roleId === 3) {
             navigate("/home");
+          } if (dataUser.data.role.roleId === 1) {
+            navigate("/vehicle-management");
           } else {
             message.warning("No tienes acceso como cliente.");
           }
