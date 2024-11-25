@@ -2,7 +2,7 @@ import axios from "axios";
 import { Brand, Model } from "./Imodel"; // Importa las interfaces necesarias
 
 // URL de la API
-const API_URL = "http://localhost:3000"; // Cambia esta URL según sea necesario
+const API_URL = "http://192.168.231.128:3000"; // Cambia esta URL según sea necesario
 
 // Función para obtener los modelos
 const fetchModels = async (): Promise<Model[]> => {

@@ -1,0 +1,26 @@
+/* Asegurar que el Sidebar esté pegado a la izquierda */
+.ant-layout-sider {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  height: 100vh;
+}
+
+/* Ajustar el contenido para evitar que se solape con el Sidebar */
+.ant-layout {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Estilo básico para el contenido principal */
+.ant-layout-content {
+  flex: 1;
+  padding: 16px; /* Espaciado interno */
+}
+
+/* Estilo básico para el Footer */
+.ant-layout-footer {
+  text-align: center;
+  padding: 16px;
+}
