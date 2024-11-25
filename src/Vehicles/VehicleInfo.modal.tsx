@@ -17,8 +17,8 @@ const VehicleInfoModal: React.FC<VehicleInfoModalProps> = ({
 
   // Generar la URL de la imagen
   const imageUrl = vehicle.image
-    ? `http://localhost:5173${vehicle.image}` // Si existe una imagen personalizada
-    : `http://localhost:5173/images/vehicles/default.jpg`; // Imagen por defecto
+    ? `http://localhost:3000${vehicle.image}` // Si existe una imagen personalizada
+    : `http://localhost:3000/images/vehicles/default.jpg`; // Imagen por defecto
 
   return (
     <Modal

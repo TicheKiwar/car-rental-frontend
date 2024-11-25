@@ -115,8 +115,8 @@ const VehicleManagement = () => {
       render: (text, record) => {
         // Ruta de la imagen
         const imageUrl = record.image
-          ? `http://localhost:5173${record.image}` // Si existe una imagen personalizada
-          : `http://localhost:5173/images/vehicles/default.jpg`; // Imagen por defecto
+          ? `http://localhost:3000${record.image}` // Si existe una imagen personalizada
+          : `http://localhost:3000/images/vehicles/default.jpg`; // Imagen por defecto
   
         return (
           <img

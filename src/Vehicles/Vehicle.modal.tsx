@@ -4,6 +4,7 @@ import { UploadOutlined } from "@ant-design/icons";
 import { VehicleModel } from "./Ivehicle";
 import { fetchModels } from "./vehicle.service";
 import { createVehicle } from "./vehicle.service";  // Asegúrate de tener la función para crear el vehículo
+import axios from "axios";
 
 const { Option } = Select;
 
@@ -21,6 +22,7 @@ const NewVehicleModal = ({
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [models, setModels] = useState<VehicleModel[]>([]);
   const [selectedModel, setSelectedModel] = useState<VehicleModel | null>(null);
+  const API_URL = "http://localhost:3000";
 
   useEffect(() => {
     if (visible) {
@@ -58,56 +60,64 @@ const NewVehicleModal = ({
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!selectedModel) {
       message.error("Debe seleccionar un modelo de vehículo");
       return;
     }
-
-    form
-      .validateFields()
-      .then((values) => {
+  
+    form.validateFields().then(async (values) => {
+      if (!imageFile) {
+        message.error("Debe subir una imagen");
+        return;
+      }
+  
+      try {
+        // Crear un FormData para enviar el archivo de imagen al backend
+        const formData = new FormData();
+        formData.append("file", imageFile);  // Enviar el archivo de imagen
+        formData.append("licensePlate", values.licensePlate);  // Enviar otros datos necesarios
+        formData.append("model", selectedModel.modelName);     // Nombre del modelo
+        formData.append("brand", selectedModel.brand.brandName);  // Nombre de la marca
+  
+        // Subir la imagen al backend
+        const uploadResponse = await axios.post(`${API_URL}/upload`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+  
+        // Obtener la ruta de la imagen de la respuesta
+        const imagePath = uploadResponse.data.imagePath;
+  
+        // Crear el objeto de datos del vehículo
         const vehicleData = {
           ...values,
+          image: imagePath, // Incluir la ruta de la imagen, no el archivo
           modelId: selectedModel?.modelId,
           capacity: Number(values.capacity),
           maxSpeed: Number(values.maxSpeed),
           mileage: Number(values.mileage),
           doorCount: Number(values.doorCount),
-          dailyRate: String(values.dailyRate), // Parsear a número decimal
-          costDayDelay: String(values.costDayDelay), // Parsear a número decimal
+          dailyRate: String(values.dailyRate),
+          costDayDelay: String(values.costDayDelay),
           lastRevisionDate: values.lastRevisionDate?.format("YYYY-MM-DD"),
           registrationDate: values.registrationDate?.format("YYYY-MM-DD"),
         };
-
-        console.log("Datos que se enviarán al backend:", vehicleData);
-
-        Modal.confirm({
-          title: "Confirmar guardado",
-          content: "¿Está seguro de que desea guardar este vehículo?",
-          okText: "Sí",
-          cancelText: "No",
-          onOk: () => {
-            createVehicle(vehicleData)  // Llama a la API para guardar el vehículo
-              .then((response) => {
-                message.success("Auto guardado exitosamente");
-                form.resetFields();
-                setImageFile(null);
-                setSelectedModel(null);
-                setIsDirty(false);
-                onClose();
-                window.location.reload();
-              })
-              .catch(() => {
-                message.error("No se guardó el auto. Verifique los campos.");
-              });
-          },
-        });
-      })
-      .catch(() => {
-        message.error("No se guardó el auto. Verifique los campos.");
-      });
+  
+        console.log(vehicleData);
+        // Enviar los datos del vehículo al backend
+        await createVehicle(vehicleData);
+        message.success("Vehículo guardado exitosamente");
+        form.resetFields();
+        setImageFile(null);
+        setSelectedModel(null);
+        onClose();
+      } catch (error) {
+        message.error("Error al guardar el vehículo o la imagen");
+      }
+    });
   };
+  
+  
 
   const handleValuesChange = () => {
     setIsDirty(true);
