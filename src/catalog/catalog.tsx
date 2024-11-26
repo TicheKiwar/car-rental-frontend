@@ -94,13 +94,9 @@ const VehicleCatalog: React.FC = () => {
   style={{ width: "30%" }}
 >
   {Array.from(new Set(vehicles.map((v) => v.status))).map((status) => {
-    const statusMap: Record<string, string> = {
-      Available: "Disponible",
-      Unavailable: "No Disponible",
-    };
     return (
       <Option key={status} value={status}>
-        {statusMap[status!] || "Estado desconocido"}
+        {status! || "Estado desconocido"}
       </Option>
     );
   })}

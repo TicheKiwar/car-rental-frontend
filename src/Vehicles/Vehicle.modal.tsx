@@ -46,7 +46,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
 
   useEffect(() => {
     if (visible) {
-      if(!isEditMode){
+      if (!isEditMode) {
         form.resetFields();
         setImageFile(null);
         setSelectedModel(null);
@@ -56,14 +56,14 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
         .catch(() => message.error("Error al cargar los modelos de autos"));
     }
   }, [visible]);
-  
+
   useEffect(() => {
     if (visible && isEditMode && vehicle) {
       form.setFieldsValue({
         ...vehicle,
         lastRevisionDatee: vehicle.lastRevisionDate ? moment(vehicle.lastRevisionDate, "YYYY-MM-DD") : null,
       });
-    
+
       if (models.length > 0 && vehicle?.model) {
         const selectedModel = models.find(model => model.modelName === vehicle?.model.modelName);
         if (selectedModel) {
@@ -71,8 +71,8 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
         }
       }
     }
-  }, [visible, isEditMode, vehicle, form, models]); 
-  
+  }, [visible, isEditMode, vehicle, form, models]);
+
   const handleFileChange: UploadProps["onChange"] = (info) => {
     const { file } = info;
     if (file.status === "done" || file.status === "removed") {
@@ -92,7 +92,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
           setIsDirty(false);
           setCancelLoading(false);
           onClose();
-          
+
         },
         onCancel: () => setCancelLoading(false),
       });
@@ -132,20 +132,20 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
 
         imageUrl = `${publicUrlData.publicUrl}?v=${imageToken}`;
       }
-      
+
       const vehicleData = {
         ...values,
         image: imageUrl,
         modelId: Number(values.modelId.value),
         capacity: Number(values.capacity),
-          maxSpeed: Number(values.maxSpeed),
-          mileage: Number(values.mileage),
-          doorCount: Number(values.doorCount),
-          dailyRate: String(values.dailyRate),
-          costDayDelay: String(values.costDayDelay),
+        maxSpeed: Number(values.maxSpeed),
+        mileage: Number(values.mileage),
+        doorCount: Number(values.doorCount),
+        dailyRate: String(values.dailyRate),
+        costDayDelay: String(values.costDayDelay),
         lastRevisionDate: values.lastRevisionDatee ? moment(values.lastRevisionDatee).format('YYYY-MM-DD') : null,
       };
-      
+
       delete vehicleData.lastRevisionDatee;
 
       if (isEditMode) {
@@ -209,20 +209,23 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
             </Form.Item>
             <Form.Item
               label="Placa"
-              name="licensePlate" 
-              rules={[{ required: true, message: "Ingrese la placa" }]}>
+              name="licensePlate"
+              rules={[{ required: true, message: "Ingrese la placa" }]}
+            >
               <Input disabled={isEditMode} />
             </Form.Item>
             <Form.Item
               label="Tipo"
               name="type"
-              rules={[{ required: true, message: "Ingrese el tipo de vehículo" }]}>
+              rules={[{ required: true, message: "Ingrese el tipo de vehículo" }]}
+            >
               <Input />
             </Form.Item>
             <Form.Item
               label="Estado"
               name="status"
-              rules={[{ required: true, message: "Seleccione el estado del vehículo" }]}>
+              rules={[{ required: true, message: "Seleccione el estado del vehículo" }]}
+            >
               <Select>
                 <Option value="Disponible">Disponible</Option>
                 <Option value="No Disponible">No Disponible</Option>
@@ -231,25 +234,68 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
             <Form.Item
               label="Tarifa diaria"
               name="dailyRate"
-              rules={[{ required: true, message: "Ingrese la tarifa diaria" }]}>
-              <Input type="number" />
+              rules={[
+                {
+                  required: true,
+                  message: "Ingrese la tarifa diaria"
+                },
+                {
+                  validator(_, value) {
+                    if (value <= 0) {
+                      return Promise.reject("La tarifa diaria debe ser mayor a 0");
+                    }
+                    return Promise.resolve();
+                  },
+                },
+              ]}
+            >
+              <Input type="number" min={1} />
             </Form.Item>
             <Form.Item
               label="Capacidad"
               name="capacity"
-              rules={[{ required: true, message: "Ingrese la capacidad" }]}>
-              <Input type="number" />
+              rules={[
+                {
+                  required: true,
+                  message: "Ingrese la capacidad"
+                },
+                {
+                  validator(_, value) {
+                    if (value <= 0) {
+                      return Promise.reject("La capacidad debe ser mayor a 0");
+                    }
+                    return Promise.resolve();
+                  },
+                },
+              ]}
+            >
+              <Input type="number" min={1} />
             </Form.Item>
             <Form.Item
               label="Velocidad máxima"
               name="maxSpeed"
-              rules={[{ required: true, message: "Ingrese la velocidad máxima" }]}>
-              <Input type="number" />
+              rules={[
+                {
+                  required: true,
+                  message: "Ingrese la velocidad máxima"
+                },
+                {
+                  validator(_, value) {
+                    if (value <= 0) {
+                      return Promise.reject("La velocidad máxima debe ser mayor a 0");
+                    }
+                    return Promise.resolve();
+                  },
+                },
+              ]}
+            >
+              <Input type="number" min={1} />
             </Form.Item>
             <Form.Item
               label="Color"
               name="color"
-              rules={[{ required: true, message: "Ingrese el color del vehículo" }]}>
+              rules={[{ required: true, message: "Ingrese el color del vehículo" }]}
+            >
               <Input />
             </Form.Item>
           </Col>
@@ -259,7 +305,8 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
             <Form.Item
               label="Transmisión"
               name="transmission"
-              rules={[{ required: true, message: "Seleccione la transmisión" }]}>
+              rules={[{ required: true, message: "Seleccione la transmisión" }]}
+            >
               <Select>
                 <Option value="Manual">Manual</Option>
                 <Option value="Automatica">Automatica</Option>
@@ -270,13 +317,28 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
             <Form.Item
               label="Número de puertas"
               name="doorCount"
-              rules={[{ required: true, message: "Ingrese el número de puertas" }]}>
-              <Input type="number" />
+              rules={[
+                {
+                  required: true,
+                  message: "Ingrese el número de puertas"
+                },
+                {
+                  validator(_, value) {
+                    if (value <= 0) {
+                      return Promise.reject("El número de puertas debe ser mayor a 0");
+                    }
+                    return Promise.resolve();
+                  },
+                },
+              ]}
+            >
+              <Input type="number" min={1} />
             </Form.Item>
             <Form.Item
               label="Tipo de combustible"
               name="fuelType"
-              rules={[{ required: true, message: "Seleccione el tipo de combustible" }]}>
+              rules={[{ required: true, message: "Seleccione el tipo de combustible" }]}
+            >
               <Select>
                 <Option value="Gasolina">Gasolina</Option>
                 <Option value="Diesel">Diesel</Option>
@@ -287,29 +349,63 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
             <Form.Item
               label="Kilometraje"
               name="mileage"
-              rules={[{ required: true, message: "Ingrese el kilometraje" }]}>
-              <Input type="number" />
+              rules={[
+                {
+                  required: true,
+                  message: "Ingrese el kilometraje"
+                },
+                {
+                  validator(_, value) {
+                    if (value <= 0) {
+                      return Promise.reject("El kilometraje debe ser mayor a 0");
+                    }
+                    return Promise.resolve();
+                  },
+                },
+              ]}
+            >
+              <Input type="number" min={1} />
             </Form.Item>
             <Form.Item
               label="Fecha de última revisión"
               name="lastRevisionDatee"
-              rules={[{ required: true, message: "Ingrese la fecha de última revisión" }]}>
-              <DatePicker style={{ width: "100%" }}/>
+              rules={[{ required: true, message: "Ingrese la fecha de última revisión" }]}
+            >
+              <DatePicker
+                style={{ width: "100%" }}
+                disabledDate={(current) => current && current > moment().endOf("day")}
+              />
             </Form.Item>
             <Form.Item
               label="Costo por día de retraso"
               name="costDayDelay"
-              rules={[{ required: true, message: "Ingrese el costo por día de retraso" }]}>
-              <Input type="number" />
+              rules={[
+                {
+                  required: true,
+                  message: "Ingrese el costo por día de retraso"
+                },
+                {
+                  validator(_, value) {
+                    if (value <= 0) {
+                      return Promise.reject("El costo por día de retraso debe ser mayor a 0");
+                    }
+                    return Promise.resolve();
+                  },
+                },
+              ]}
+            >
+              <Input type="number" min={1} />
             </Form.Item>
             <Form.Item
               label="Modelo"
               name="modelId"
-              rules={[{ required: true, message: "Seleccione un modelo" }]}>
+              rules={[{ required: true, message: "Seleccione un modelo" }]}
+            >
               <Select
                 placeholder="Seleccione un modelo"
                 labelInValue
-                value={selectedModel ? selectedModel.modelId : undefined}>
+                value={selectedModel ? selectedModel.modelId : undefined}
+              >
                 {models.map((model) => (
                   <Option key={model.modelId} value={model.modelId}>
                     {model.modelName}
