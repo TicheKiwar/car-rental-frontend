@@ -15,6 +15,5 @@ export interface VehicleType {
     fuelType: string | null;
     // reservations: Reservations[];
     model: ModelType;
-    image: string|null
-    
+    image: string
 }

@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Card, Col, Row, Modal, Button, Input, Select,Typography } from "antd";
+import { Card, Col, Row, Modal, Button, Input, Select } from "antd";
 import { VehicleType } from "../common/vehicle.type";
 import { fetchData, getData } from "../services/catalog.service";
-import { url } from "../services/api.service";
 
 const { Meta } = Card;
 const { Option } = Select;
@@ -15,7 +14,6 @@ const VehicleCatalog: React.FC = () => {
   const [search, setSearch] = useState("");
   const [filterBrand, setFilterBrand] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
-  const { Title, Text } = Typography;
 
   useEffect(() => {
     const loadVehicles = async () => {
@@ -90,7 +88,7 @@ const VehicleCatalog: React.FC = () => {
           ))}
         </Select>
         <Select
-  placeholder="Filtrar por estado"  
+  placeholder="Filtrar por estado"
   allowClear
   onChange={(value) => handleStatusFilter(value || null)}
   style={{ width: "30%" }}
@@ -98,7 +96,7 @@ const VehicleCatalog: React.FC = () => {
   {Array.from(new Set(vehicles.map((v) => v.status))).map((status) => {
     return (
       <Option key={status} value={status}>
-        {status}
+        {status! || "Estado desconocido"}
       </Option>
     );
   })}
@@ -109,7 +107,10 @@ const VehicleCatalog: React.FC = () => {
       {/* Catálogo de Vehículos */}
       <Row gutter={[16, 16]}>
         {filteredVehicles.map((vehicle) => {
-          const imageUrl = `${url}/${vehicle.image}`;
+          const imageUrl = vehicle.image
+          ? `${vehicle.image}`
+          : `http://localhost:3000/images/vehicles/default.jpg`;
+
           return (
             <Col span={6} key={vehicle.vehicleId}>
               <Card
@@ -118,9 +119,6 @@ const VehicleCatalog: React.FC = () => {
                   <img
                     alt="Vehicle"
                     src={imageUrl}
-                    onError={(e) => {
-                      e.currentTarget.src = `${url}/images/vehicles/default.jpg`;
-                    }}
                     style={{
                       width: "100%",
                       height: "150px",
@@ -140,57 +138,36 @@ const VehicleCatalog: React.FC = () => {
         })}
       </Row>
 
+      {/* Modal */}
       {selectedVehicle && (
         <Modal
-          title={<Title level={3}>{`Detalles del Vehículo - ${selectedVehicle.licensePlate}`}</Title>}
+          title={`Detalles del Vehículo - ${selectedVehicle.licensePlate}`}
           open={isModalOpen}
           onCancel={handleModalClose}
           footer={[
-            <Button key="close" type="primary" onClick={handleModalClose} size="large">
+            <Button key="close" onClick={handleModalClose}>
               Cerrar
             </Button>,
           ]}
-          width={600} // Puedes ajustar el ancho del modal
-          style={{ top: 20 }} // Agregar un pequeño margen superior si es necesario
         >
-          <Row gutter={16}>
-            <Col span={12}>
-              <p>
-                <strong>Tipo:</strong>
-                <Text>{selectedVehicle.type}</Text>
-              </p>
-            </Col>
-            <Col span={12}>
-              <p>
-                <strong>Estado:</strong>
-                <Text>{selectedVehicle.status}</Text>
-              </p>
-            </Col>
-            <Col span={12}>
-              <p>
-                <strong>Color:</strong>
-                <Text>{selectedVehicle.color}</Text>
-              </p>
-            </Col>
-            <Col span={12}>
-              <p>
-                <strong>Número de puertas:</strong>
-                <Text>{selectedVehicle.doorCount}</Text>
-              </p>
-            </Col>
-            <Col span={12}>
-              <p>
-                <strong>Modelo:</strong>
-                <Text>{selectedVehicle.model.name}</Text>
-              </p>
-            </Col>
-            <Col span={12}>
-              <p>
-                <strong>Marca:</strong>
-                <Text>{selectedVehicle.model.brand.name}</Text>
-              </p>
-            </Col>
-          </Row>
+          <p>
+            <strong>Tipo:</strong> {selectedVehicle.type}
+          </p>
+          <p>
+            <strong>Estado:</strong> {selectedVehicle.status}
+          </p>
+          <p>
+            <strong>Color:</strong> {selectedVehicle.color}
+          </p>
+          <p>
+            <strong>Número de puertas:</strong> {selectedVehicle.doorCount}
+          </p>
+          <p>
+            <strong>Modelo:</strong> {selectedVehicle.model.name}
+          </p>
+          <p>
+            <strong>Marca:</strong> {selectedVehicle.model.brand.name}
+          </p>
         </Modal>
       )}
     </div>
