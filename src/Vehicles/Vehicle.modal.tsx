@@ -222,7 +222,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
                 <Option value="De lujo">De lujo</Option>
                 <Option value="Deportivos">Deportivos</Option>
                 <Option value="Utilitarios">Utilitarios</Option>
-                <Option value="Ecológicos">Ecológicos</Option>
+                <Option value="Ecologicos">Ecológicos</Option>
                 <Option value="Especializados">Especializados</Option>
                 <Option value="Transporte grupal">Transporte grupal</Option>
               </Select>
@@ -248,14 +248,15 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
               rules={validationRules.color}
             >
               <Select>
-                <Option value="Red">Rojo</Option>
-                <Option value="Blue">Azul</Option>
-                <Option value="Green">Verde</Option>
-                <Option value="Yellow">Amarillo</Option>
-                <Option value="Black">Negro</Option>
-                <Option value="White">Blanco</Option>
-                <Option value="Orange">Naranja</Option>
-                <Option value="Purple">Púrpura</Option>
+                <Option value="Rojo">Rojo</Option>
+                <Option value="Azul">Azul</Option>
+                <Option value="Verde">Verde</Option>
+                <Option value="Amarillo">Amarillo</Option>
+                <Option value="Negro">Negro</Option>
+                <Option value="Blanco">Blanco</Option>
+                <Option value="Naranja">Naranja</Option>
+                <Option value="Purpura">Púrpura</Option>
+                <Option value="Gris">Púrpura</Option>
               </Select>
             </Form.Item>
 
@@ -270,8 +271,8 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
             >
               <Select>
                 <Option value="Manual">Manual</Option>
-                <Option value="Automatica">Automatica</Option>
-                <Option value="Semi-Automatica">Semi-Automatica</Option>
+                <Option value="Automatica">Automática</Option>
+                <Option value="Semi-Automatica">Semi-Automática</Option>
                 <Option value="Doble-Embrague">Doble Embrague</Option>
               </Select>
             </Form.Item>
