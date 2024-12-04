@@ -35,6 +35,9 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onLogout }) => {
     Cliente: [
       { key: 'catalogo', label: 'Catálogo', icon: <HomeOutlined />, route: '/Home' },
     ],
+    inv: [
+      { key: 'catalogo', label: 'Catálogo', icon: <HomeOutlined />, route: '/Home' },
+    ],
   };
 
   const options = menuOptions[role] || [];

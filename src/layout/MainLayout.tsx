@@ -13,14 +13,19 @@ const MainLayout: React.FC = () => {
   const { Header } = Layout;
 const { Title } = Typography;
 
-  useEffect(() => {
-    const userRole = localStorage.getItem("userRole");
-    if (userRole) {
-      setUser(JSON.parse(userRole));
-    } else {
-      navigate("/");
-    }
-  }, [navigate]);
+useEffect(() => {
+  let userRole = localStorage.getItem("userRole");
+
+  if (!userRole) {
+    // Si no existe rol, asigna el rol 'inv'
+    const defaultUser = { roleName: "inv" };
+    localStorage.setItem("userRole", JSON.stringify(defaultUser));
+    setUser(defaultUser);
+  } else {
+    // Si existe rol, usa el almacenado
+    setUser(JSON.parse(userRole));
+  }
+}, []);
 
   const handleLogout = () => {
     localStorage.removeItem("userRole");
@@ -28,7 +33,6 @@ const { Title } = Typography;
   };
 
   if (!user) {
-    // Muestra un loader o nada mientras se cargan los datos
     return <div>Cargando...</div>;  
   }
 
@@ -47,16 +51,16 @@ const { Title } = Typography;
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', // Para agregar una sombra sutil
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
       }}
     >
       <Row style={{ width: '100%', alignItems: 'center' }}>
         {/* Logo */}
         <Col>
           <img
-            src={logo} // Asegúrate de que la rutaz de la imagen del logo sea correcta
+            src={logo} 
             alt="Logo"
-            style={{ height: 80 }} // Ajusta el tamaño del logo
+            style={{ height: 80 }} 
           />
         </Col>
 
