@@ -178,6 +178,7 @@ const VehicleManagement = () => {
             onClick={() => handleEdit(record.vehicleId)}
             shape="circle"
             size="small"
+            id={`edit-${record.licensePlate}`}
             title="Editar"
             style={{ color: "blue" }}
           />
@@ -186,6 +187,7 @@ const VehicleManagement = () => {
             onClick={() => handleDelete(record.vehicleId)}
             shape="circle"
             size="small"
+            id={`delete-${record.licensePlate}`}
             title="Eliminar"
             style={{ color: "red" }}
           />
@@ -194,6 +196,7 @@ const VehicleManagement = () => {
             onClick={() => handleInfo(record.vehicleId)}
             shape="circle"
             size="small"
+            id={`info-${record.licensePlate}`}
             title="Información"
             style={{ color: "green" }}
           />
@@ -231,6 +234,7 @@ const VehicleManagement = () => {
         />
         <Button
           icon={<PlusCircleOutlined />}
+          id="add-vehicle"
           type="primary"
           onClick={handleAddVehicle}
         >
@@ -252,7 +256,7 @@ const VehicleManagement = () => {
       <Modal
         title="Confirmación"
         open={isConfirmDeleteModalVisible}
-        onOk={confirmDelete}
+        onOk= {confirmDelete}
         onCancel={cancelDelete}
         okText="Sí"
         cancelText="No"

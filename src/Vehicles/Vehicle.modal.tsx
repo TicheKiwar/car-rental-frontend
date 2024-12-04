@@ -73,13 +73,6 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
     }
   }, [visible, isEditMode, vehicle, form, models]);
 
-  const handleFileChange: UploadProps["onChange"] = (info) => {
-    const { file } = info;
-    if (file.status === "done" || file.status === "removed") {
-      setImageFile(file.originFileObj || null);
-    }
-  };
-
   const handleCancel = () => {
     setCancelLoading(true);
     if (isDirty) {
@@ -178,7 +171,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
         <Button key="cancel" onClick={handleCancel} loading={cancelLoading}>
           Cancelar
         </Button>,
-        <Button key="save" type="primary" onClick={handleSave} loading={loading}>
+        <Button key="save" id="save-vehicle" type="primary" onClick={handleSave} loading={loading}>
           {isEditMode ? "Guardar Cambios" : "Guardar"}
         </Button>,
       ]}
@@ -200,8 +193,11 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
               <Upload
                 accept=".jpg,.jpeg,.png"
                 maxCount={1}
-                onChange={handleFileChange}
-                beforeUpload={() => false}
+                beforeUpload={(file) => {
+                  setImageFile(file);
+                  return false;
+                }}
+                onRemove={() => setImageFile(null)}
                 listType="picture"
               >
                 <Button icon={<UploadOutlined />}>Subir o arrastrar imagen</Button>
@@ -210,6 +206,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
             <Form.Item
               label="Placa"
               name="licensePlate"
+              id="licensePlate"
               rules={[{ required: true, message: "Ingrese la placa" }]}
             >
               <Input disabled={isEditMode} />
@@ -217,6 +214,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
             <Form.Item
               label="Tipo"
               name="type"
+              id="type"
               rules={[{ required: true, message: "Ingrese el tipo de vehículo" }]}
             >
               <Input />
@@ -224,6 +222,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
             <Form.Item
               label="Estado"
               name="status"
+              id="status"
               rules={[{ required: true, message: "Seleccione el estado del vehículo" }]}
             >
               <Select>
@@ -254,6 +253,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
             <Form.Item
               label="Capacidad"
               name="capacity"
+              id="capacity"
               rules={[
                 {
                   required: true,
@@ -274,6 +274,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
             <Form.Item
               label="Velocidad máxima"
               name="maxSpeed"
+              id="maxSpeed"
               rules={[
                 {
                   required: true,
@@ -294,6 +295,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
             <Form.Item
               label="Color"
               name="color"
+              id="color"
               rules={[{ required: true, message: "Ingrese el color del vehículo" }]}
             >
               <Input />
@@ -305,6 +307,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
             <Form.Item
               label="Transmisión"
               name="transmission"
+              id="transmission"
               rules={[{ required: true, message: "Seleccione la transmisión" }]}
             >
               <Select>
@@ -317,6 +320,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
             <Form.Item
               label="Número de puertas"
               name="doorCount"
+              id="doorCount"
               rules={[
                 {
                   required: true,
@@ -337,6 +341,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
             <Form.Item
               label="Tipo de combustible"
               name="fuelType"
+              id="fuelType"
               rules={[{ required: true, message: "Seleccione el tipo de combustible" }]}
             >
               <Select>
@@ -349,6 +354,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
             <Form.Item
               label="Kilometraje"
               name="mileage"
+              id="mileage"
               rules={[
                 {
                   required: true,
@@ -369,6 +375,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
             <Form.Item
               label="Fecha de última revisión"
               name="lastRevisionDatee"
+              id="lastRevisionDatee"
               rules={[{ required: true, message: "Ingrese la fecha de última revisión" }]}
             >
               <DatePicker
@@ -379,6 +386,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
             <Form.Item
               label="Costo por día de retraso"
               name="costDayDelay"
+              id="costDayDelay"
               rules={[
                 {
                   required: true,
@@ -399,6 +407,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
             <Form.Item
               label="Modelo"
               name="modelId"
+              id="modelId"
               rules={[{ required: true, message: "Seleccione un modelo" }]}
             >
               <Select
