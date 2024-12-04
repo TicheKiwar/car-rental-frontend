@@ -19,6 +19,8 @@ import moment from "moment";
 import { createVehicle, fetchModels, updateVehicle } from "../services/vehicle.service";
 import { v4 as uuidv4 } from "uuid";
 import { validationRules } from "../utils/vehicle.validation";
+import { fetchBrands } from "../Model/model.service";
+import { Brand } from "../Model/Imodel";
 
 const { Option } = Select;
 
@@ -42,6 +44,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
   const [selectedModel, setSelectedModel] = useState<VehicleModel | null>(null);
   const [loading, setLoading] = useState(false);
   const [cancelLoading, setCancelLoading] = useState(false);
+  const [brands, setBrands] = useState<Brand[]>([]);
 
   const isEditMode = !!vehicle;
 
@@ -55,6 +58,14 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
       fetchModels()
         .then((response) => setModels(response))
         .catch(() => message.error("Error al cargar los modelos de autos"));
+    }
+  }, [visible]);
+
+  useEffect(() => {
+    if (visible) {  
+      fetchBrands() 
+        .then((response) => setBrands(response))  
+        .catch(() => message.error("Error al cargar las marcas"));  
     }
   }, [visible]);
 
@@ -256,10 +267,9 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
                 <Option value="Blanco">Blanco</Option>
                 <Option value="Naranja">Naranja</Option>
                 <Option value="Purpura">Púrpura</Option>
-                <Option value="Gris">Púrpura</Option>
+                <Option value="Gris">Gris</Option>
               </Select>
             </Form.Item>
-
           </Col>
 
           {/* Columna 2 */}
@@ -292,7 +302,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
             </Form.Item>
             <Form.Item
               label="Fecha de última revisión"
-              name="lastRevisionDate"
+              name="lastRevisionDatee"
               rules={validationRules.lastRevisionDate}
             >
               <DatePicker
@@ -306,6 +316,19 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
               rules={validationRules.costDayDelay}
             >
               <Input type="number" min={1} />
+            </Form.Item>
+            <Form.Item
+              name="brandId"
+              label="Marca"
+              rules={[{ required: true, message: "Por favor, seleccione una marca" }]}
+            >
+              <Select placeholder="Seleccione una marca" loading={loading}>
+                {brands.map((brand) => (
+                  <Option key={brand.brandId} value={brand.brandId}>
+                    {brand.brandName}
+                  </Option>
+                ))}
+              </Select>
             </Form.Item>
             <Form.Item label="Modelo" name="modelId" rules={validationRules.modelId}>
               <Select

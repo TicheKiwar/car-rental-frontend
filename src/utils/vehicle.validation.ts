@@ -1,4 +1,3 @@
-
 export const validateGreaterThanZero = (_, value) => {
     if (value <= 0) {
         return Promise.reject(new Error("El valor debe ser mayor a 0"));
@@ -21,15 +20,39 @@ export const validationRules = {
     status: [{ required: true, message: "Seleccione el estado del vehículo" }],
     dailyRate: [
         { required: true, message: "Ingrese la tarifa diaria" },
-        { validator: validateGreaterThanZero },
+        { 
+            validator: (rule, value) => {
+                if (value < 20 || value > 500) {
+                    return Promise.reject(new Error("La tarifa diaria debe estar entre 20 y 500"));
+                }
+                return Promise.resolve();
+            }
+        },
+        
     ],
     capacity: [
         { required: true, message: "Ingrese la capacidad" },
-        { validator: validateGreaterThanZero },
+        { 
+            validator: (rule, value) => {
+                if (value < 1 || value > 20) {
+                    return Promise.reject(new Error("La capacidad debe estar entre 1 y 20 personas"));
+                }
+                return Promise.resolve();
+            }
+        },
+        
     ],
     maxSpeed: [
         { required: true, message: "Ingrese la velocidad máxima" },
-        { validator: validateGreaterThanZero },
+        { 
+            validator: (rule, value) => {
+                if (value < 40 || value > 300) {
+                    return Promise.reject(new Error("La velocidad máxima debe estar entre 0 y 300"));
+                }
+                return Promise.resolve();
+            }
+        },
+        
     ],
     color: [{ required: true, message: "Ingrese el color del vehículo" }],
     transmission: [{ required: true, message: "Seleccione la transmisión" }],
@@ -50,22 +73,26 @@ export const validationRules = {
             },
         },
     ],
-
     fuelType: [{ required: true, message: "Seleccione el tipo de combustible" }],
     mileage: [
         { required: true, message: "Ingrese el kilometraje" },
-        { validator: validateGreaterThanZero },
+        { 
+            validator: (rule, value) => {
+                if (value < 0) {
+                    return Promise.reject(new Error("El kilometraje debe ser un número positivo"));
+                }
+                return Promise.resolve();
+            }
+        },
     ],
     lastRevisionDate: [{ required: true, message: "Ingrese la fecha de última revisión" }],
     costDayDelay: [
         { required: true, message: "Ingrese el costo por día de retraso" },
         {
             validator: (rule, value, callback) => {
-                if (value < 10) {
-                    callback("El valor debe ser mayor o igual a 10");
-                } else if (value > 100) {
-                    callback("El valor debe ser menor o igual a 100");
-                } else {
+                if (value < 2 || value > 7) {
+                    callback("El costo debe estra entre 20  a 500");
+                }else {
                     callback(); // Validación correcta
                 }
             }
