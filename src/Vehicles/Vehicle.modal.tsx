@@ -20,7 +20,7 @@ import { createVehicle, fetchModels, updateVehicle } from "../services/vehicle.s
 import { v4 as uuidv4 } from "uuid";
 import { validationRules } from "../utils/vehicle.validation";
 import { fetchBrands } from "../Model/model.service";
-import { Brand } from "../Model/Imodel";
+import { Brand, Model } from "../Model/Imodel";
 
 const { Option } = Select;
 
@@ -42,6 +42,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [models, setModels] = useState<VehicleModel[]>([]);
   const [selectedModel, setSelectedModel] = useState<VehicleModel | null>(null);
+  const [filteredModels, setFilteredModels] = useState<Model[]>([]);
   const [loading, setLoading] = useState(false);
   const [cancelLoading, setCancelLoading] = useState(false);
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -55,35 +56,38 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
         setImageFile(null);
         setSelectedModel(null);
       }
+      fetchBrands()
+        .then((response) => setBrands(response))
+        .catch(() => message.error("Error al cargar las marcas"));
       fetchModels()
         .then((response) => setModels(response))
-        .catch(() => message.error("Error al cargar los modelos de autos"));
+        .catch(() => message.error("Error al cargar los modelos"));
     }
   }, [visible]);
 
-  useEffect(() => {
-    if (visible) {  
-      fetchBrands() 
-        .then((response) => setBrands(response))  
-        .catch(() => message.error("Error al cargar las marcas"));  
-    }
-  }, [visible]);
+  const handleBrandChange = (brandId: number) => {
+    const filtered = models.filter((model) => model.brand.brandId === brandId);
+    setFilteredModels(filtered);
+    form.setFieldsValue({ modelId: undefined }); // Resetear modelo seleccionado
+  };
+
 
   useEffect(() => {
     if (visible && isEditMode && vehicle) {
       form.setFieldsValue({
         ...vehicle,
-        lastRevisionDatee: vehicle.lastRevisionDate ? moment(vehicle.lastRevisionDate, "YYYY-MM-DD") : null,
+        brandId: vehicle.model?.brand?.brandId, // Establece el valor de la marca
+        modelId: {
+          value: vehicle.model?.modelId,
+          label: vehicle.model?.modelName,
+        },
+        lastRevisionDatee: vehicle.lastRevisionDate
+          ? moment(vehicle.lastRevisionDate, "YYYY-MM-DD")
+          : null,
       });
-
-      if (models.length > 0 && vehicle?.model) {
-        const selectedModel = models.find(model => model.modelName === vehicle?.model.modelName);
-        if (selectedModel) {
-          form.setFieldsValue({ modelId: { value: selectedModel.modelId, label: selectedModel.modelName } });
-        }
-      }
     }
-  }, [visible, isEditMode, vehicle, form, models]);
+  }, [visible, isEditMode, vehicle, form]);
+
 
   const handleFileChange: UploadProps["onChange"] = (info) => {
     const { file } = info;
@@ -148,7 +152,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
       const vehicleData = {
         ...values,
         image: imageUrl,
-        modelId: Number(values.modelId.value),
+        modelId: Number(values.modelId),
         capacity: Number(values.capacity),
         maxSpeed: Number(values.maxSpeed),
         mileage: Number(values.mileage),
@@ -159,6 +163,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
       };
 
       delete vehicleData.lastRevisionDatee;
+      delete vehicleData.brandId;
 
       if (isEditMode) {
         await updateVehicle(vehicle?.vehicleId!, vehicleData);
@@ -322,7 +327,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
               label="Marca"
               rules={[{ required: true, message: "Por favor, seleccione una marca" }]}
             >
-              <Select placeholder="Seleccione una marca" loading={loading}>
+              <Select placeholder="Seleccione una marca" onChange={handleBrandChange}>
                 {brands.map((brand) => (
                   <Option key={brand.brandId} value={brand.brandId}>
                     {brand.brandName}
@@ -330,13 +335,14 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
                 ))}
               </Select>
             </Form.Item>
-            <Form.Item label="Modelo" name="modelId" rules={validationRules.modelId}>
-              <Select
-                placeholder="Seleccione un modelo"
-                labelInValue
-                value={selectedModel ? selectedModel.modelId : undefined}
-              >
-                {models.map((model) => (
+
+            <Form.Item
+              name="modelId"
+              label="Modelo"
+              rules={[{ required: true, message: "Por favor, seleccione un modelo" }]}
+            >
+              <Select placeholder="Seleccione un modelo">
+                {filteredModels.map((model) => (
                   <Option key={model.modelId} value={model.modelId}>
                     {model.modelName}
                   </Option>

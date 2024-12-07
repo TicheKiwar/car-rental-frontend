@@ -11,10 +11,10 @@ export const validationRules = {
             required: true,
             message: "Ingrese la placa"
         },
-        {
-            pattern: /^[A-Za-z]{3}-\d{4}$/,
-            message: "La placa debe tener el formato 'AAA-0001'"
-        }
+         {
+             pattern: /^[A-Za-z]{3}-\d{4}$/,
+             message: "La placa debe tener el formato 'AAA-0001'"
+         }
     ],
     type: [{ required: true, message: "Ingrese el tipo de vehículo" }],
     status: [{ required: true, message: "Seleccione el estado del vehículo" }],
@@ -90,7 +90,7 @@ export const validationRules = {
         { required: true, message: "Ingrese el costo por día de retraso" },
         {
             validator: (rule, value, callback) => {
-                if (value < 2 || value > 7) {
+                if (value < 20 || value > 500) {
                     callback("El costo debe estra entre 20  a 500");
                 }else {
                     callback(); // Validación correcta
