@@ -8,6 +8,7 @@ import ForgotPassword from "./auth/forgotPassword";
 import ResetPassword from "./auth/resetPassword";
 import Home from "./Home/home";
 import MainLayout from "./layout/MainLayout"
+import ReturnManagment from "./ReturnVehicle/ReturnManagment";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/vehicle-management" element={<VehicleManagement />} />
           <Route path="/model-management" element={<ModelManagement />} />
+          <Route path="/return-vehicle" element={<ReturnManagment />} />
         </Route>
       </Routes>
     </Router>

@@ -6,6 +6,7 @@ import {
   HomeOutlined,
   LogoutOutlined,
   AppstoreAddOutlined,
+  RedoOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom'; 
 
@@ -28,9 +29,12 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onLogout }) => {
       { key: 'autos', label: 'Gestión de Autos', icon: <CarOutlined />, route: '/vehicle-management' },
       { key: 'usuarios', label: 'Gestión de Usuarios', icon: <UserOutlined />, route: '/Home' },
       { key: 'modelos', label: 'Gestión de Modelos', icon: <AppstoreAddOutlined />, route: '/model-management' },
+      { key: 'devolucion', label: 'Devolución de Autos', icon: <RedoOutlined />, route: '/return-vehicle' }, 
     ],
     employee: [
       { key: 'alquiler', label: 'Alquiler de Autos', icon: <CarOutlined />, route: '/Home' },
+      { key: 'devolucion', label: 'Devolución de Autos', icon: <RedoOutlined />, route: '/return-vehicle' }, 
+
     ],
     Cliente: [
       { key: 'catalogo', label: 'Catálogo', icon: <HomeOutlined />, route: '/Home' },
