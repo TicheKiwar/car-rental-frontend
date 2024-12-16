@@ -1,88 +1,104 @@
 import React, { useState, useEffect } from "react";
-import { Input, Table, Button, Space } from "antd";
-import { EditOutlined, DeleteOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import { Input, Table, Button, Space, Form } from "antd";
+import { EditOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import ReturnInformacion from './ReturnInfo'; 
+import ModalForm from './ReturnForm'; 
+import { getRentals } from "../services/return.service";
+import { ReturnDetails } from "../ReturnVehicle/IReturn";
 
 const ReturnManagment = () => {
-  // Filtros
   const [fecha, setFecha] = useState("");
   const [cliente, setCliente] = useState("");
   const [auto, setAuto] = useState("");
-  
-  // Datos de ejemplo (simulados)
-  const reservas = [
-    {
-      estado: "Pendiente",
-      auto: "ABC123",
-      fecha: "2024-12-15",
-      cliente: "Juan Pérez",
-      empleado: "Ana Gómez",
-    },
-    {
-      estado: "Atrasado",
-      auto: "XYZ789",
-      fecha: "2024-12-10",
-      cliente: "Carlos López",
-      empleado: "Luis Martínez",
-    },
-    {
-      estado: "Pendiente",
-      auto: "LMN456",
-      fecha: "2024-12-13",
-      cliente: "Maria Sánchez",
-      empleado: "Paola Ruiz",
-    },
-  ];
+  const [tableData, setTableData] = useState<ReturnDetails[]>([]);
+  const [visibleInfo, setVisibleInfo] = useState(false);
+  const [selectedReservation, setSelectedReservation] = useState<ReturnDetails | null>(null);
+  const [visibleEdit, setVisibleEdit] = useState(false);
+  const [form] = Form.useForm();
 
-  // Datos filtrados según los filtros
-  const [tableData, setTableData] = useState(reservas);
-
-  // Filtrar la tabla cuando se cambian los filtros
   useEffect(() => {
-    const filteredData = reservas.filter((reserva) => {
-      return (
-        (fecha ? reserva.fecha.includes(fecha) : true) &&
-        (cliente ? reserva.cliente.toLowerCase().includes(cliente.toLowerCase()) : true) &&
-        (auto ? reserva.auto.toLowerCase().includes(auto.toLowerCase()) : true)
-      );
-    });
-    setTableData(filteredData);
-  }, [fecha, cliente, auto]);
+    // Fetch data from backend
+    const fetchData = async () => {
+      try {
+        const rentals = await getRentals();
+        setTableData(rentals);
+      } catch (error) {
+        console.error("Error fetching rentals:", error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const filteredData = tableData.filter((reserva) => {
+    return (
+      (fecha ? reserva.reservation_date.includes(fecha) : true) &&
+      (cliente
+        ? `${reserva.client_first_name} ${reserva.client_last_name}`
+            .toLowerCase()
+            .includes(cliente.toLowerCase())
+        : true) &&
+      (auto ? reserva.image.toLowerCase().includes(auto.toLowerCase()) : true)
+    );
+  });
+
+  const handleInfoClick = (record: ReturnDetails) => {
+    setSelectedReservation(record);
+    setVisibleInfo(true);
+  };
+
+  const handleEditClick = (record: ReturnDetails) => {
+    setSelectedReservation(record);
+    setVisibleEdit(true);
+    form.setFieldsValue(record);
+  };
+
+  const handleSubmit = () => {
+    console.log("Formulario enviado");
+    setVisibleEdit(false);
+  };
 
   const columns = [
     {
       title: "Estado",
       dataIndex: "estado",
       key: "estado",
-      render: (estado: string) => (
-        <span style={{ color: estado === "Pendiente" ? "orange" : "green" }}>
-          {estado}
+      render: () => (
+        <span style={{ color: "orange" }}>
+          Pendiente
         </span>
       ),
     },
     {
       title: "Auto",
-      dataIndex: "auto",
-      key: "auto",
+      dataIndex: "image",
+      key: "image",
+      render: (image: string) => (
+        <img src={image} alt="Auto" style={{ width: "100px", height: "60px", objectFit: "cover" }} />
+      ),
     },
     {
       title: "Fecha",
-      dataIndex: "fecha",
-      key: "fecha",
+      dataIndex: "reservation_date",
+      key: "reservation_date",
     },
     {
       title: "Cliente",
       dataIndex: "cliente",
       key: "cliente",
+      render: (_: any, record: ReturnDetails) =>
+        `${record.client_first_name} ${record.client_last_name}`,
     },
     {
       title: "Empleado",
       dataIndex: "empleado",
       key: "empleado",
+      render: (_: any, record: ReturnDetails) =>
+        `${record.employee_first_name} ${record.employee_last_name}`,
     },
     {
       title: "Acciones",
       key: "acciones",
-      render: (_: any, record: any) => (
+      render: (_: any, record: ReturnDetails) => (
         <Space size="middle">
           <Button
             icon={<EditOutlined />}
@@ -90,13 +106,7 @@ const ReturnManagment = () => {
             size="small"
             title="Editar"
             style={{ color: "blue" }}
-          />
-          <Button
-            icon={<DeleteOutlined />}
-            shape="circle"
-            size="small"
-            title="Eliminar"
-            style={{ color: "red" }}
+            onClick={() => handleEditClick(record)}
           />
           <Button
             icon={<InfoCircleOutlined />}
@@ -104,6 +114,7 @@ const ReturnManagment = () => {
             size="small"
             title="Información"
             style={{ color: "green" }}
+            onClick={() => handleInfoClick(record)}
           />
         </Space>
       ),
@@ -135,8 +146,25 @@ const ReturnManagment = () => {
         />
       </div>
 
-      <Table dataSource={tableData} columns={columns} rowKey="auto" />
+      <Table dataSource={filteredData} columns={columns} rowKey="rental_id" />
 
+      {selectedReservation && (
+        <ReturnInformacion
+          visible={visibleInfo}
+          onClose={() => setVisibleInfo(false)}
+          reserva={selectedReservation}
+        />
+      )}
+
+      {selectedReservation && (
+        <ModalForm
+          visible={visibleEdit}
+          onCancel={() => setVisibleEdit(false)}
+          handleSubmit={handleSubmit}
+          initialValues={selectedReservation}
+          form={form}
+        />
+      )}
     </div>
   );
 };
