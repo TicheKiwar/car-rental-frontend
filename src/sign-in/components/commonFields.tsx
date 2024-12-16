@@ -1,9 +1,13 @@
 import React from 'react';
 import { Form, Input, Row, Col } from 'antd';
-import { UserOutlined, MailOutlined, LockOutlined } from '@ant-design/icons';
+import { MailOutlined, LockOutlined } from '@ant-design/icons';
 import { validateDni } from '../../utils/validation';
 
-const CommonFields = () => (
+interface CommonFieldsProps {
+  isEditing: boolean;
+}
+
+const CommonFields: React.FC<CommonFieldsProps> = ({ isEditing }) => (
   <Row gutter={16}>
     <Col span={12}>
       <Form.Item name="dni" label="C.I." rules={[
@@ -14,7 +18,7 @@ const CommonFields = () => (
               },
             ]}
           >
-            <Input placeholder="C.I." maxLength={10} onKeyPress={(e) => /[0-9]/.test(e.key) || e.preventDefault()} />      
+            <Input placeholder="C.I." maxLength={10} disabled={isEditing} onKeyPress={(e) => /[0-9]/.test(e.key) || e.preventDefault()} />      
       </Form.Item>
     </Col>
     <Col span={12}>
@@ -50,15 +54,20 @@ const CommonFields = () => (
         <Input prefix={<MailOutlined />} placeholder="Correo Electrónico" />
       </Form.Item>
     </Col>
-    <Col span={12}>
-      <Form.Item
-        name="password"
-        label="Contraseña"
-        rules={[{ required: true, message: 'Por favor ingresa una contraseña' }, { min: 6, message: 'La contraseña debe tener al menos 6 caracteres' }]}
-      >
-        <Input.Password prefix={<LockOutlined />} placeholder="Contraseña" />
-      </Form.Item>
-    </Col>
+    {!isEditing && (
+      <Col span={12}>
+        <Form.Item
+          name="password"
+          label="Contraseña"
+          rules={[
+            { required: true, message: 'Por favor ingresa una contraseña' },
+            { min: 6, message: 'La contraseña debe tener al menos 6 caracteres' },
+          ]}
+        >
+          <Input.Password prefix={<LockOutlined />} placeholder="Contraseña" />
+        </Form.Item>
+      </Col>
+    )}
   </Row>
 );
 
