@@ -35,6 +35,9 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onLogout }) => {
     Cliente: [
       { key: 'catalogo', label: 'Catálogo', icon: <HomeOutlined />, route: '/Home' },
     ],
+    inv: [
+      { key: 'catalogo', label: 'Catálogo', icon: <HomeOutlined />, route: '/Home' },
+    ],
   };
 
   const options = menuOptions[role] || [];
@@ -67,6 +70,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onLogout }) => {
         {/* Opción de cierre de sesión al final */}
         <Menu.Item
           key="logout"
+          id="logout"
           icon={<LogoutOutlined style={{ color: 'red' }} />}
           onClick={onLogout}
           style={{ color: 'red', fontWeight: 'bold', position: 'absolute', bottom: 16, width: '100%' }}

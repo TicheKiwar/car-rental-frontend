@@ -217,8 +217,11 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
               <Upload
                 accept=".jpg,.jpeg,.png"
                 maxCount={1}
-                onChange={handleFileChange}
-                beforeUpload={() => false}
+                beforeUpload={(file) => {
+                  setImageFile(file);
+                  return false;
+                }}
+                onRemove={() => setImageFile(null)}
                 listType="picture"
               >
                 <Button icon={<UploadOutlined />}>Subir o arrastrar imagen</Button>
@@ -241,12 +244,6 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
                 <Option value="Ecologicos">Ecológicos</Option>
                 <Option value="Especializados">Especializados</Option>
                 <Option value="Transporte grupal">Transporte grupal</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item label="Estado" name="status" rules={validationRules.status}>
-              <Select>
-                <Option value="Disponible">Disponible</Option>
-                <Option value="No Disponible">No Disponible</Option>
               </Select>
             </Form.Item>
             <Form.Item label="Tarifa diaria" name="dailyRate" rules={validationRules.dailyRate}>
