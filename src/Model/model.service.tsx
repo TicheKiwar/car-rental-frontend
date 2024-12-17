@@ -1,13 +1,11 @@
-import axios from "axios";
 import { Brand, Model } from "./Imodel"; // Importa las interfaces necesarias
+import { api } from "../services/api.service";
 
-// URL de la API
-const API_URL = "http://192.168.231.128:3000"; // Cambia esta URL según sea necesario
 
 // Función para obtener los modelos
 const fetchModels = async (): Promise<Model[]> => {
   try {
-    const response = await axios.get<Model[]>(`${API_URL}/model`);
+    const response = await api.get(`/model`);
     return response.data;
   } catch (error) {
     console.error("Error fetching models:", error);
@@ -15,10 +13,9 @@ const fetchModels = async (): Promise<Model[]> => {
   }
 };
 
-// Función para obtener las marcas
 const fetchBrands = async (): Promise<Brand[]> => {
   try {
-    const response = await axios.get<Brand[]>(`${API_URL}/brand`);  // Cambia esta URL según sea necesario
+    const response = await api.get(`/brand`);  
     return response.data;
   } catch (error) {
     console.error("Error fetching brands:", error);
@@ -28,31 +25,31 @@ const fetchBrands = async (): Promise<Brand[]> => {
 
 const createModel = async (model: { modelName: string; year: number; brandId: number }): Promise<void> => {
   try {
-    await axios.post(`${API_URL}/model`, model);
+    await api.post(`/model`, model);
   } catch (error) {
     console.error("Error creando el modelo:", error);
-    throw error; // Lanza el error para manejarlo en el frontend
+    throw error; 
   }
 };
 
 // Servicio para eliminar un modelo
 const deleteModel = async (id: number): Promise<void> => {
   try {
-    await axios.delete(`${API_URL}/model/${id}`);
+    await api.delete(`/model/${id}`);
   } catch (error) {
     console.error("Error eliminando el modelo:", error);
-    throw error; // Lanza el error para manejarlo en el frontend
+    throw error; 
   }
 };
 
 // Función para actualizar un modelo
 const updateModel = async (id: number, modelData: { modelName: string, year: number, brandId: number }): Promise<void> => {
   try {
-    await axios.put(`${API_URL}/model/${id}`, modelData);
+    await api.put(`/model/${id}`, modelData);
   } catch (error) {
     console.error("Error al actualizar el modelo:", error);
-    throw error;  // Lanza el error para manejarlo en el frontend
+    throw error;  
   }
 };
 
-export { fetchModels, fetchBrands, createModel, deleteModel, updateModel };  // Exportamos ambas funciones
+export { fetchModels, fetchBrands, createModel, deleteModel, updateModel }; 
