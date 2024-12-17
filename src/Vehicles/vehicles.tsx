@@ -5,12 +5,10 @@ import {
   EditOutlined,
   DeleteOutlined,
   InfoCircleOutlined,
-  HomeOutlined,
 } from "@ant-design/icons";
 import { Vehicle } from "./Ivehicle";
 import VehicleInfoModal from "./VehicleInfo.modal";
 import NewVehicleModal from "./Vehicle.modal";
-import { Link } from "react-router-dom";
 import { deleteVehicle, fetchVehicles } from "../services/vehicle.service";
 
 const VehicleManagement = () => {
@@ -59,8 +57,13 @@ const VehicleManagement = () => {
     setIsNewVehicleModalVisible(true);
   };
 
-  const handleDelete = (vehicleId: number) => {
-    setDeleteVehicleId(vehicleId);
+  const handleDelete = (vehicle: Vehicle) => {
+    if(vehicle.status !== 'Disponible'){
+      message.warning("El vehículo no puede ser eliminado porque se encuentra ocupado o en mantenimiento")
+      return
+    }
+    setDeleteVehicleId(vehicle.vehicleId
+    );
     setIsConfirmDeleteModalVisible(true);
   };
 
@@ -108,8 +111,8 @@ const VehicleManagement = () => {
       setTableData(
         allVehicles.filter(
           (item) =>
-            item.color.toLowerCase().includes(value) ||
-            item.type.toLowerCase().includes(value)
+            item.model.brand.brandName.toLowerCase().includes(value) ||
+            item.model.modelName.toLowerCase().includes(value)
         )
       );
     }
@@ -184,7 +187,7 @@ const VehicleManagement = () => {
           />
           <Button
             icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record.vehicleId)}
+            onClick={() => handleDelete(record)}
             shape="circle"
             size="small"
             id={`delete-${record.licensePlate}`}
@@ -208,21 +211,6 @@ const VehicleManagement = () => {
   return (
     <div style={{ padding: "20px", backgroundColor: "white", position: "relative" }}>
       <h1>Administración de Vehículos</h1>
-
-      <Link to="/home">
-        <Button
-          icon={<HomeOutlined />}
-          shape="circle"
-          style={{
-            position: "absolute",
-            top: 20,
-            right: 20,
-            borderColor: "transparent",
-            backgroundColor: "#ffffff",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-          }}
-        />
-      </Link>
 
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
         <Input.Search

@@ -10,17 +10,11 @@ export const createClient = async (userData: any) => {
     }
 };
 
-export const createEmployee = async (userData: any) => {
-    try {
-        const response = await api.post("/employees", userData);
-        return response.data;
-    } catch (error) {
-        console.error("Error al crear el empleado:", error);
-        throw error;
-    }
-};
-
 export const checkEmailOrDni = async (email: string, dni: string, id: number) => {
     const response = await api.post(`/users/validate/${id}`, { email, dni });
     return response.data;
+};
+
+export const verifyEmailCode = async (email: string, code: string) => {
+    return await api.post('/users/verify-email', { email, code });
 };

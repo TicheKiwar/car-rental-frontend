@@ -26,8 +26,10 @@ const Login: React.FC = () => {
           message.success("Inicio de sesión exitoso");
           if (dataUser.data.role.roleId === 3) {
             navigate("/home");
-          } if (dataUser.data.role.roleId === 1) {
+          } else if (dataUser.data.role.roleId === 1) {
             navigate("/vehicle-management");
+          } else if (dataUser.data.role.roleId === 2) {
+            navigate("/Home");
           }
         }
       }

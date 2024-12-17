@@ -96,15 +96,13 @@ useEffect(() => {
         <Footer style={{ textAlign: "center", backgroundColor: "#f0f2f5" }}>
           <div className="home-footer-sections">
             <div>
-              <h4>Principales Destinos de Estados Unidos</h4>
+              <h4>Principales Destinos de Ecuador</h4>
               <ul>
                 <li>Guía de viaje</li>
-                <li>Alquiler de vehículos en Las Vegas</li>
-                <li>Alquiler de vehículos en Los Ángeles</li>
               </ul>
             </div>
             <div>
-              <h4>Extras de Avis</h4>
+              <h4>Extras de EFALKT</h4>
               <ul>
                 <li>Productos de alquiler</li>
                 <li>Servicios de vehículos</li>
@@ -113,7 +111,7 @@ useEffect(() => {
             <div>
               <h4>Información de la Empresa</h4>
               <ul>
-                <li>Acerca de Avis</li>
+                <li>Acerca de EFALKT</li>
                 <li>Mapa del sitio</li>
               </ul>
             </div>
@@ -126,7 +124,7 @@ useEffect(() => {
             </div>
           </div>
           <p className="home-footer-copyright">
-            © 2024 Gestión de Alquiler de Vehículos. Todos los derechos reservados.
+            © 2024 AutoPick - EFALKT. Todos los derechos reservados.
           </p>
         </Footer>
       </Layout>

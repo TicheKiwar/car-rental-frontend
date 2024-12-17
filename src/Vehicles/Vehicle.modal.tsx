@@ -136,7 +136,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
           .from("images-vehicles")
           .upload(`vehicles/${values.licensePlate || vehicle?.licensePlate}`, imageFile, {
             cacheControl: "3600",
-            upsert: isEditMode,
+            upsert: true,
           });
 
         if (error) throw new Error("Error al cargar la imagen");
