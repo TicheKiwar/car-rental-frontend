@@ -243,14 +243,15 @@ const VehicleCatalog: React.FC = () => {
         />
       )}
 
-      {selectedVehicle && (
+    {selectedVehicle && (
         <NewReservationModal
-          show={isReservationModalOpen}
-          handleClose={handleModalClose}
-          handleSave={handleSaveReservation}
-          vehicle={selectedVehicle}
+            visible={isReservationModalOpen}
+            onClose={handleModalClose}
+            onSave={handleSaveReservation}
+            vehicle={selectedVehicle}
+            isNew={true}
         />
-      )}
+    )}
     </div>
   );
 };

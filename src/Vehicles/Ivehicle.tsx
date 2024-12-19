@@ -18,7 +18,7 @@ export interface Vehicle {
   licensePlate: string;
   type: string;
   status: string;
-  dailyRate: string;
+  dailyRate: number;
   capacity: number;
   maxSpeed: number;
   color: string;
