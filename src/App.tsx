@@ -27,13 +27,10 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/vehicle-management" element={<VehicleManagement />} />
           <Route path="/model-management" element={<ModelManagement />} />
-<<<<<<< HEAD
           <Route path="/return-vehicle" element={<ReturnManagment />} />
-=======
           <Route path="/client-management" element={<ClientsManagement />} />
           <Route path="/employee-management" element={<EmployeesManagement />} />
           <Route path="/admin-management" element={<ModelManagement />} />
->>>>>>> develop
         </Route>
       </Routes>
     </Router>

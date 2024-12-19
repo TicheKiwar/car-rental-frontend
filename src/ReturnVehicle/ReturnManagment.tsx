@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Input, Table, Button, Space, Form } from "antd";
+import { Input, Table, Button, Space, Form, Select, message } from "antd";
 import { EditOutlined, InfoCircleOutlined } from "@ant-design/icons";
-import ReturnInformacion from './ReturnInfo'; 
-import ModalForm from './ReturnForm'; 
-import { getRentals } from "../services/return.service";
+import ReturnInformacion from './RentalInfo';
+import ModalForm from './ReturnForm';
+import { getRentals, postRentalReturn } from "../services/return.service";
 import { ReturnDetails } from "../ReturnVehicle/IReturn";
 
+const { Option } = Select;
+
 const ReturnManagment = () => {
-  const [fecha, setFecha] = useState("");
   const [cliente, setCliente] = useState("");
   const [auto, setAuto] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState<string | null>("TODOS");
   const [tableData, setTableData] = useState<ReturnDetails[]>([]);
   const [visibleInfo, setVisibleInfo] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState<ReturnDetails | null>(null);
@@ -31,13 +33,13 @@ const ReturnManagment = () => {
 
   const filteredData = tableData.filter((reserva) => {
     return (
-      (fecha ? reserva.reservation_date.includes(fecha) : true) &&
       (cliente
         ? `${reserva.client_first_name} ${reserva.client_last_name}`
             .toLowerCase()
             .includes(cliente.toLowerCase())
         : true) &&
-      (auto ? reserva.image.toLowerCase().includes(auto.toLowerCase()) : true)
+      (auto ? reserva.image.toLowerCase().includes(auto.toLowerCase()) : true) &&
+      (selectedStatus === "TODOS" || reserva.rental_status.toUpperCase() === selectedStatus)
     );
   });
 
@@ -52,21 +54,38 @@ const ReturnManagment = () => {
     form.setFieldsValue(record);
   };
 
-  const handleSubmit = () => {
-    console.log("Formulario enviado");
-    setVisibleEdit(false);
+  const handleSubmit = async (formData) => {
+    try {
+      const response = await postRentalReturn(formData); // Reemplaza con tu servicio de envío
+      console.log("Respuesta del servidor:", response);
+      message.success("Devolución registrada correctamente.");
+
+      // Actualiza la tabla tras el envío exitoso
+      const updatedRentals = await getRentals();
+      setTableData(updatedRentals);
+
+      setVisibleEdit(false); // Cierra el modal
+    } catch (error) {
+      console.error("Error al enviar los datos:", error);
+      message.error("Error al registrar la devolución. Intenta de nuevo.");
+    }
+  };
+
+  const getMaxReturnDate = (reservation_date: string, reservation_days: number): string => {
+    const date = new Date(reservation_date);
+    date.setDate(date.getDate() + reservation_days);
+    return date.toLocaleDateString("es-ES"); // Formato dd/mm/yyyy
   };
 
   const columns = [
     {
       title: "Estado",
-      dataIndex: "estado",
+      dataIndex: "rental_status",
       key: "estado",
-      render: () => (
-        <span style={{ color: "orange" }}>
-          Pendiente
-        </span>
-      ),
+      render: (rental_status: string) => {
+        const color = rental_status.toUpperCase() === "ATRASADO" ? "red" : "orange";
+        return <span style={{ color }}>{rental_status.toUpperCase()}</span>;
+      },
     },
     {
       title: "Auto",
@@ -77,9 +96,21 @@ const ReturnManagment = () => {
       ),
     },
     {
-      title: "Fecha",
+      title: "Fecha de reserva",
       dataIndex: "reservation_date",
       key: "reservation_date",
+      render: (date: string) => {
+        const formattedDate = new Date(date).toLocaleDateString("es-ES"); // Formato dd/mm/yyyy
+        return <span>{formattedDate}</span>;
+      },
+    },
+    {
+      title: "Fecha máxima de entrega",
+      key: "max_return_date",
+      render: (_: any, record: ReturnDetails) => {
+        const maxReturnDate = getMaxReturnDate(record.reservation_date, record.reservation_days);
+        return <span>{maxReturnDate}</span>;
+      },
     },
     {
       title: "Cliente",
@@ -101,20 +132,21 @@ const ReturnManagment = () => {
       render: (_: any, record: ReturnDetails) => (
         <Space size="middle">
           <Button
-            icon={<EditOutlined />}
-            shape="circle"
-            size="small"
-            title="Editar"
-            style={{ color: "blue" }}
-            onClick={() => handleEditClick(record)}
-          />
-          <Button
             icon={<InfoCircleOutlined />}
             shape="circle"
             size="small"
             title="Información"
             style={{ color: "green" }}
             onClick={() => handleInfoClick(record)}
+          />
+          <Button
+            icon={<EditOutlined />}
+            shape="circle"
+            size="small"
+            title="Editar"
+            style={{ color: "#e65100" }}
+            onClick={() => handleEditClick(record)}
+            disabled={record.rental_status.toUpperCase() === "PENDIENTE"} // Deshabilitar si el estado es "PENDIENTE"
           />
         </Space>
       ),
@@ -127,12 +159,6 @@ const ReturnManagment = () => {
 
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
         <Input
-          placeholder="Filtrar por Fecha"
-          onChange={(e) => setFecha(e.target.value)}
-          value={fecha}
-          style={{ width: "200px" }}
-        />
-        <Input
           placeholder="Filtrar por Cliente"
           onChange={(e) => setCliente(e.target.value)}
           value={cliente}
@@ -144,6 +170,19 @@ const ReturnManagment = () => {
           value={auto}
           style={{ width: "200px" }}
         />
+        <Select
+          placeholder="Filtrar por Estado"
+          onChange={(value) => setSelectedStatus(value)}
+          allowClear
+          style={{ width: "200px" }}
+          value={selectedStatus}
+        >
+          <Option value="TODOS">TODOS</Option>
+          <Option value="PENDIENTE">PENDIENTE</Option>
+          <Option value="EN CURSO">EN CURSO</Option>
+          <Option value="PAGADO">PAGADO</Option>
+          <Option value="ATRASADO">ATRASADO</Option>
+        </Select>
       </div>
 
       <Table dataSource={filteredData} columns={columns} rowKey="rental_id" />
@@ -161,7 +200,7 @@ const ReturnManagment = () => {
           visible={visibleEdit}
           onCancel={() => setVisibleEdit(false)}
           handleSubmit={handleSubmit}
-          initialValues={selectedReservation}
+          reserva={selectedReservation}
           form={form}
         />
       )}

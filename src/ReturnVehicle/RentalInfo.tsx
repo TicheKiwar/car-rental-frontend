@@ -28,7 +28,8 @@ const ReturnInformacion = ({ visible, onClose, reserva }) => {
     telefonoEmpleado: reserva.employee_phone,
     fechaReservacion: reserva.reservation_date,
     diasReservacion: reserva.reservation_days,
-    costoPorDia: `$${reserva.cost_per_day}`,
+    costoPorDia: reserva.daily_rate,
+    costoPorDiaDeRetraso: reserva.cost_day_delay,
   };
 
   const handleImageClick = () => {
@@ -83,6 +84,7 @@ const ReturnInformacion = ({ visible, onClose, reserva }) => {
           <Text strong style={{ fontSize: '16px' }}>Fecha Reservación:</Text> <Text style={{ fontSize: '16px' }}>{reservaInfo.fechaReservacion}</Text><br />
           <Text strong style={{ fontSize: '16px' }}>Días de la Reservación:</Text> <Text style={{ fontSize: '16px' }}>{reservaInfo.diasReservacion}</Text><br />
           <Text strong style={{ fontSize: '16px' }}>Costo por Día:</Text> <Text style={{ fontSize: '16px' }}>{reservaInfo.costoPorDia}</Text><br />
+          <Text strong style={{ fontSize: '16px' }}>Costo por Día Retraso:</Text> <Text style={{ fontSize: '16px' }}>{reservaInfo.costoPorDiaDeRetraso}</Text><br />
 
           <Divider style={{ margin: '20px 0' }} />
 
