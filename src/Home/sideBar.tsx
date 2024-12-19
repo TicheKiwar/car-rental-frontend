@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Children } from 'react';
 import { Layout, Menu } from 'antd';
 import {
   CarOutlined,
@@ -6,10 +6,13 @@ import {
   HomeOutlined,
   LogoutOutlined,
   AppstoreAddOutlined,
+  CrownOutlined,
+  TeamOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom'; 
 
 const { Sider } = Layout;
+const { SubMenu } = Menu;
 
 interface SidebarProps {
   role: string; 
@@ -25,26 +28,62 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onLogout }) => {
 
   const menuOptions = {
     Administrador: [
-      { key: 'autos', label: 'Gestión de Autos', icon: <CarOutlined />, route: '/vehicle-management' },
-      { key: 'usuarios', label: 'Gestión de Usuarios', icon: <UserOutlined />, route: '/Home' },
-      { key: 'modelos', label: 'Gestión de Modelos', icon: <AppstoreAddOutlined />, route: '/model-management' },
-    ],
-    employee: [
-      { key: 'alquiler', label: 'Alquiler de Autos', icon: <CarOutlined />, route: '/Home' },
-    ],
-    Cliente: [
-      { key: 'catalogo', label: 'Catálogo', icon: <HomeOutlined />, route: '/Home' },
-      { key: 'reservacion', label: 'Reservación', icon: <CarOutlined />, route: '/Reservation' },
-    ],
-    inv: [
-      { key: 'catalogo', label: 'Catálogo', icon: <HomeOutlined />, route: '/Home' },
-    ],
-  };
+      { key: 'autos', label: 'Gestión de Autos', icon: <CarOutlined />, children: [
+        {
+          key: 'vehiculos',
+          label: 'Vehículos',
+          icon: <CarOutlined/>,
+          route: '/vehicle-management'
+        },
+        { key: 'modelos', label: 'Modelos', icon: <AppstoreAddOutlined />, route: '/model-management' },
+      ] },
+      {
+        key: 'usuarios',
+        label: 'Usuarios',
+        icon: <UserOutlined />,
+        children: [
+          {
+            key: 'clientes',
+            label: 'Clientes',
+            icon: <UserOutlined />,
+            route: '/client-management',
+          },
+          {
+            key: 'empleados',
+            label: 'Empleados',
+            icon: <TeamOutlined />,
+            route: '/employee-management',
+          },
+          {
+            key: 'administradores',
+            label: 'Administradores',
+            icon: <CrownOutlined />,
+            route: '/admin-management',
+          },
+        ],
+      },
+      ],
+      Empleado: [
+        { key: 'alquiler', label: 'Alquiler de Autos', icon: <CarOutlined />, route: '/Home' },
+        {
+          key: 'clientes',
+          label: 'Clientes',
+          icon: <UserOutlined />,
+          route: '/client-management',
+        },
+      ],
+      Cliente: [
+        { key: 'catalogo', label: 'Catálogo', icon: <HomeOutlined />, route: '/Home' },
+      ],
+      inv: [
+        { key: 'catalogo', label: 'Catálogo', icon: <HomeOutlined />, route: '/Home' },
+      ],
+    };
 
   const options = menuOptions[role] || [];
 
   const handleMenuClick = (route: string) => {
-    navigate(route); // Redirige a la ruta cuando se hace clic
+    if (route) navigate(route); // Redirige a la ruta cuando se hace clic
   };
 
   return (
@@ -61,19 +100,39 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onLogout }) => {
           justifyContent: 'space-between',
         }}
       >
-        {/* Opciones principales */}
-        {options.map(({ key, label, icon, route }) => (
-          <Menu.Item key={key} icon={icon} onClick={() => handleMenuClick(route)}>
-            {label}
-          </Menu.Item>
-        ))}
+        {options.map(({ key, label, icon, route, children }) => {
+          if (children) {
+            return (
+              <SubMenu key={key} icon={icon} title={label}>
+                {children.map(({ key, label, icon, route }) => (
+                  <Menu.Item key={key} icon={icon} onClick={() => handleMenuClick(route)}>
+                    {label}
+                  </Menu.Item>
+                ))}
+              </SubMenu>
+            );
+          }
+
+          return (
+            <Menu.Item key={key} icon={icon} onClick={() => handleMenuClick(route)}>
+              {label}
+            </Menu.Item>
+          );
+        })}
 
         {/* Opción de cierre de sesión al final */}
         <Menu.Item
           key="logout"
+          id="logout"
           icon={<LogoutOutlined style={{ color: 'red' }} />}
           onClick={onLogout}
-          style={{ color: 'red', fontWeight: 'bold', position: 'absolute', bottom: 16, width: '100%' }}
+          style={{
+            color: 'red',
+            fontWeight: 'bold',
+            position: 'absolute',
+            bottom: 16,
+            width: '100%',
+          }}
         >
           Cerrar Sesión
         </Menu.Item>
