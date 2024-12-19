@@ -1,11 +1,10 @@
 import React from "react";
 import { Modal, Descriptions } from "antd";
-import { Vehicle } from "./Ivehicle";
 
 interface VehicleInfoModalProps {
   visible: boolean;
   onClose: () => void;
-  vehicle: Vehicle | null;
+  vehicle: any | null;
 }
 
 const VehicleInfoModal: React.FC<VehicleInfoModalProps> = ({
@@ -16,13 +15,12 @@ const VehicleInfoModal: React.FC<VehicleInfoModalProps> = ({
   if (!vehicle) return null;
 
   const imageUrl = vehicle.image
-            ? `${vehicle.image}`
-    : `http://localhost:3000/images/vehicles/default.jpg`;
+            ;
 
   return (
     <Modal
       title={`Información del Vehículo : ${vehicle.licensePlate}`}
-      visible={visible}
+      open={visible}
       onCancel={onClose}
       footer={null}
       width={900}
@@ -44,7 +42,7 @@ const VehicleInfoModal: React.FC<VehicleInfoModalProps> = ({
         <div style={{ width: "60%" }}>
           <Descriptions column={1} bordered>
             <Descriptions.Item label="Modelo">
-             {vehicle.model.brand.brandName} {vehicle.model.modelName} ({vehicle.model.year})
+             {vehicle.model.brand.name} {vehicle.model.name} ({vehicle.model.year})
             </Descriptions.Item>
             <Descriptions.Item label="Tipo">
              {vehicle.type}
@@ -78,12 +76,6 @@ const VehicleInfoModal: React.FC<VehicleInfoModalProps> = ({
             </Descriptions.Item>
             <Descriptions.Item label="Fecha de Registro">
               {vehicle.registrationDate}
-            </Descriptions.Item>
-            <Descriptions.Item label="N. de Motor">
-              {vehicle.motorNumber}
-            </Descriptions.Item>
-            <Descriptions.Item label="N. de Chasis">
-              {vehicle.chasisNumber}
             </Descriptions.Item>
           </Descriptions>
         </div>

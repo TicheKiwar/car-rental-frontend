@@ -11,6 +11,7 @@ import {
   EditOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
+import { validateEmailOrDni } from '../utils/validation';
 
 const EmployeesManagement: React.FC = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -89,6 +90,8 @@ const EmployeesManagement: React.FC = () => {
 
   const handleSubmit = async (values: any) => {
     setLoadingSubmit(true);
+    const { email, dni } = values;
+
     const data = {
       ...values,
       salary: Number(values.salary),
@@ -99,6 +102,12 @@ const EmployeesManagement: React.FC = () => {
 
     try {
       if (selectedEmployee) {
+        const existEmailOrDni: any = await checkEmailOrDni(email, dni, selectedEmployee.user.userId);
+        
+        if (validateEmailOrDni(existEmailOrDni.emailExists, existEmailOrDni.dniExists)) {
+          setLoading(false);
+          return;
+        }
         delete data.hireDate;
         await updateEmployee(selectedEmployee.employeeId, data);
         setEmployees(
@@ -106,6 +115,12 @@ const EmployeesManagement: React.FC = () => {
         );
         message.success('Empleado actualizado con éxito');
       } else {
+        const existEmailOrDni: any = await checkEmailOrDni(email, dni, 0);
+        
+        if (validateEmailOrDni(existEmailOrDni.emailExists, existEmailOrDni.dniExists)) {
+          setLoading(false);
+          return;
+        }
         const newEmployee = await createEmployee(data);
         setEmployees([...employees, newEmployee]);
         message.success('Empleado creado con éxito');
@@ -201,3 +216,7 @@ const EmployeesManagement: React.FC = () => {
 };
 
 export default EmployeesManagement;
+function checkEmailOrDni(email: any, dni: any, userId: any): any {
+  throw new Error('Function not implemented.');
+}
+

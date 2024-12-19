@@ -50,8 +50,16 @@ export const updateVehicle = async (vehicleId: number, vehicleData: any): Promis
 export const deleteVehicle = async (vehicleId: number) => {
     try {
         await api.delete(`/vehicles/${vehicleId}`);
-        message.success("Vehículo eliminado con éxito.");
     } catch (error) {
-        message.error("Error al eliminar el vehículo.");
     }
+};
+
+export const checkMotorOrChasis = async (motor: string, chasis: string, id: number) => {
+    const response = await api.post(`/vehicles/validate-numbers/${id}`, { motor, chasis });
+    return response.data;
+};
+
+export const checkLicensePlate = async (plate: string, id: number) => {
+    const response = await api.post(`/vehicles/validate-plate/${id}`, { plate });
+    return response.data;
 };

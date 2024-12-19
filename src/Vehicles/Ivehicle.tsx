@@ -32,4 +32,6 @@ export interface Vehicle {
   deletedAt: string | null;
   model: VehicleModel;
   image: string;
+  motorNumber: string;
+  chasisNumber: string;
 }

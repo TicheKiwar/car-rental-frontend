@@ -112,7 +112,8 @@ const VehicleManagement = () => {
         allVehicles.filter(
           (item) =>
             item.model.brand.brandName.toLowerCase().includes(value) ||
-            item.model.modelName.toLowerCase().includes(value)
+            item.model.modelName.toLowerCase().includes(value) ||
+            item.licensePlate.toLowerCase().includes(value)
         )
       );
     }
