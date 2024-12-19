@@ -35,3 +35,25 @@ export const validateEmailOrDni = (emailExists: boolean, dniExists: boolean): bo
     }
     return false;
 };
+
+export const validateMotorOrChasis = (motorExists: boolean, chasisExists: boolean): boolean => {
+    if (motorExists) {
+        message.error('El motor ya está en uso por otro vehículo. Por favor elige otro.');
+        return true;
+    }
+
+    if (chasisExists) {
+        message.error('El chasis ya está en uso por otro vehículo. Por favor elige otro.');
+        return true;
+    }
+    return false;
+};
+
+export const validatePlate = (plateExists: boolean): boolean => {
+    if (plateExists) {
+        message.error('Ya existe un vehículo con esta placa. Por favor elige otra.');
+        return true;
+    }
+
+    return false;
+};
