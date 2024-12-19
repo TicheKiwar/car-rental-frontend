@@ -10,6 +10,7 @@ import Home from "./Home/home";
 import MainLayout from "./layout/MainLayout"
 import ClientsManagement from "./Users/clients.page";
 import EmployeesManagement from "./Users/employees.page";
+import ReservationManagement from "./reservations/reservations";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           <Route path="/client-management" element={<ClientsManagement />} />
           <Route path="/employee-management" element={<EmployeesManagement />} />
           <Route path="/admin-management" element={<ModelManagement />} />
+          <Route path="/Reservations" element={<ReservationManagement />} />
         </Route>
       </Routes>
     </Router>
