@@ -9,6 +9,8 @@ import {
   EditOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
+import { checkEmailOrDni } from '../services/sign-in.service';
+import { validateEmailOrDni } from '../utils/validation';
 
 const ClientsManagement: React.FC = () => {
   const [clientes, setClientes] = useState<Client[]>([]);
@@ -86,14 +88,30 @@ const ClientsManagement: React.FC = () => {
 
   const handleSubmit = async (values: any) => {
     setLoadingSubmit(true);
+    const { email, dni } = values;
+    
     try {
       if (selectedClient) {
+        const existEmailOrDni: any = await checkEmailOrDni(email, dni, selectedClient.user.userId);
+        
+        if (validateEmailOrDni(existEmailOrDni.emailExists, existEmailOrDni.dniExists)) {
+          setLoading(false);
+          return;
+        }
+        
         await updateClient(selectedClient.clientId, values);
         setClientes(
           clientes.map((c) => c.clientId === selectedClient.clientId ? { ...c, ...values } : c)
         );
         message.success('Cliente actualizado con éxito');
       } else {
+        const existEmailOrDni: any = await checkEmailOrDni(email, dni, 0);
+        
+        if (validateEmailOrDni(existEmailOrDni.emailExists, existEmailOrDni.dniExists)) {
+          setLoading(false);
+          return;
+        }
+
         const newClient = await createClient(values);
         setClientes([...clientes, newClient]);
         message.success('Cliente creado con éxito');

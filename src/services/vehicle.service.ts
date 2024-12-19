@@ -50,9 +50,7 @@ export const updateVehicle = async (vehicleId: number, vehicleData: any): Promis
 export const deleteVehicle = async (vehicleId: number) => {
     try {
         await api.delete(`/vehicles/${vehicleId}`);
-        message.success("Vehículo eliminado con éxito.");
     } catch (error) {
-        message.error("Error al eliminar el vehículo.");
     }
 };
 

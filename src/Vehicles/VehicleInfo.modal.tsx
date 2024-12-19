@@ -79,6 +79,12 @@ const VehicleInfoModal: React.FC<VehicleInfoModalProps> = ({
             <Descriptions.Item label="Fecha de Registro">
               {vehicle.registrationDate}
             </Descriptions.Item>
+            <Descriptions.Item label="N. de Motor">
+              {vehicle.motorNumber}
+            </Descriptions.Item>
+            <Descriptions.Item label="N. de Chasis">
+              {vehicle.chasisNumber}
+            </Descriptions.Item>
           </Descriptions>
         </div>
       </div>

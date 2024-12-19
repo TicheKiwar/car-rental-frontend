@@ -34,8 +34,8 @@ const RegistrationForm = () => {
       const userData = { ...form.getFieldsValue() };
       await createClient(userData);
       
-      message.info('Código de verificación enviado a tu correo.');
-      setIsModalVisible(true); // Muestra el modal
+      message.info('Se ha envíado un dódigo de verificación enviado a tu correo.');
+      setIsModalVisible(true);
     } catch (error) {
       message.error('Error en el registro, intenta nuevamente.');
     } finally {
