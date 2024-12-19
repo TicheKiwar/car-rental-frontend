@@ -84,35 +84,41 @@ const VehicleCatalog: React.FC = () => {
     setIsInfoModalOpen(false);
   };
 
-  const handleSaveReservation = async (reservationData: { reservationDate: string; reservationDays: number; totalCost: string; vehicleId: number }) => {
-    try {
+// In VehicleCatalog component (catalog.component.tsx)
+const handleSaveReservation = async (reservationData: {
+  reservationDate: string;
+  reservationDays: number;
+  totalCost: string;
+  vehicleId: number;
+}) => {
+  try {
       const isReservationCreated = await createReservation(reservationData);
 
       if (!isReservationCreated) {
-        console.log("Reserva guardada con éxito.");
-        handleModalClose();
-        
-        // Reload vehicles after successful reservation
-        await loadVehicles();
-        
-        Modal.success({
-          content: 'La reserva se ha guardado correctamente.',
-        });
+          console.log("Reserva guardada con éxito.");
+          handleModalClose();
+          
+          // Reload vehicles after successful reservation
+          await loadVehicles();
+          
+          Modal.success({
+              content: 'La reserva se ha guardado correctamente.',
+          });
       } else {
-        console.log("No se pudo guardar la reserva.");
-        Modal.error({
-          title: 'Error',
-          content: 'Hubo un problema al guardar la reserva. Por favor, inténtalo nuevamente.',
-        });
+          console.log("No se pudo guardar la reserva.");
+          Modal.error({
+              title: 'Error',
+              content: 'Hubo un problema al guardar la reserva. Por favor, inténtalo nuevamente.',
+          });
       }
-    } catch (error) {
+  } catch (error) {
       console.error("Error al guardar la reserva:", error);
       Modal.error({
-        title: 'Error',
-        content: 'Hubo un problema al guardar la reserva. Por favor, inténtalo nuevamente.',
+          title: 'Error',
+          content: 'Hubo un problema al guardar la reserva. Por favor, inténtalo nuevamente.',
       });
-    }
-  };
+  }
+};
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.toLowerCase();
