@@ -34,6 +34,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onLogout }) => {
     ],
     Cliente: [
       { key: 'catalogo', label: 'Catálogo', icon: <HomeOutlined />, route: '/Home' },
+      { key: 'reservacion', label: 'Reservación', icon: <CarOutlined />, route: '/Reservation' },
     ],
     inv: [
       { key: 'catalogo', label: 'Catálogo', icon: <HomeOutlined />, route: '/Home' },
