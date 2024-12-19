@@ -10,7 +10,6 @@ import {
   Col,
   Select,
   DatePicker,
-  UploadProps,
   Divider
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
@@ -89,14 +88,6 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
       });
     }
   }, [visible, isEditMode, vehicle, form]);
-
-
-  const handleFileChange: UploadProps["onChange"] = (info) => {
-    const { file } = info;
-    if (file.status === "done" || file.status === "removed") {
-      setImageFile(file.originFileObj || null);
-    }
-  };
 
   const handleCancel = () => {
     setCancelLoading(true);
@@ -244,7 +235,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
   <Row gutter={16}>
     {/* Columna 1 */}
     <Col span={8}>
-      <Divider>Información Básica</Divider>
+      <Divider>Información del Vehículo</Divider>
 
       <Form.Item label="Imagen" valuePropName="file">
         <Upload
@@ -299,11 +290,11 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
       </Form.Item>
 
       <Form.Item label="Tarifa diaria" name="dailyRate" rules={validationRules.dailyRate}>
-        <Input type="number" min={1} />
+        <Input type="number" min={1} prefix="$"/>
       </Form.Item>
 
       <Form.Item label="Costo por día de retraso" name="costDayDelay" rules={validationRules.costDayDelay}>
-        <Input type="number" min={1} />
+        <Input type="number" min={1} prefix="$"/>
       </Form.Item>
     </Col>
 
@@ -325,7 +316,7 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
       </Form.Item>
 
       <Form.Item label="Velocidad máxima" name="maxSpeed" rules={validationRules.maxSpeed}>
-        <Input type="number" min={1} />
+        <Input type="number" min={1} suffix="km/h"/>
       </Form.Item>
 
       <Form.Item label="Número de puertas" name="doorCount" rules={validationRules.doorCount}>
@@ -340,59 +331,69 @@ const NewVehicleModal: React.FC<NewVehicleModalProps> = ({
       </Form.Item>
     </Col>
 
-    {/* Columna 3 */}
-    <Col span={8}>
-    <Divider>Identificación del Vehículo</Divider>
-      <Form.Item label="N. de Motor" name="motorNumber"
-      rules={[
-        { required: true, message: "Por favor, ingrese el número de motor" },
-        { min: 5, max: 20, message: "Debe tener entre 5 y 20 caracteres" },
-      ]}>
-        <Input />
-      </Form.Item>
+      {/* Columna 3 */}
+      <Col span={8}>
+      <Divider>Identificación del Vehículo</Divider>
+        <Form.Item label="N. de Motor" name="motorNumber"
+        rules={[
+          { required: true, message: "Por favor, ingrese el número de motor" },
+          { min: 5, max: 20, message: "Debe tener entre 5 y 20 caracteres" },
+          {
+            validator: (_, value) =>
+              value && value.trim() !== ""
+                ? Promise.resolve()
+                : Promise.reject(new Error("El campo no puede estar vacío")),
+          }
+        ]}>
+          <Input />
+        </Form.Item>
 
-      <Form.Item label="N. de Chasis" name="chasisNumber"
-      rules={[
-        { required: true, message: "Por favor, ingrese el número de chasis" },
-        { min: 17, max: 17, message: "Debe tener exactamente 17 caracteres" },
-      ]}
-      >
-        <Input />
-      </Form.Item>
+        <Form.Item label="N. de Chasis" name="chasisNumber"
+        rules={[
+          { required: true, message: "Por favor, ingrese el número de chasis" },
+          { min: 17, max: 17, message: "Debe tener exactamente 17 caracteres" },
+          {
+            validator: (_, value) =>
+              value && value.trim() !== ""
+                ? Promise.resolve()
+                : Promise.reject(new Error("El campo no puede estar vacío")),
+          }
+        ]}
+        >
+          <Input />
+        </Form.Item>
 
-      <Divider>Detalles Adicionales</Divider>
+        <Divider>Detalles del Vehículo</Divider>
 
-      <Form.Item label="Color" name="color" rules={validationRules.color}>
-        <Select>
-          <Option value="Rojo">Rojo</Option>
-          <Option value="Azul">Azul</Option>
-          <Option value="Verde">Verde</Option>
-          <Option value="Amarillo">Amarillo</Option>
-          <Option value="Negro">Negro</Option>
-          <Option value="Blanco">Blanco</Option>
-          <Option value="Naranja">Naranja</Option>
-          <Option value="Purpura">Púrpura</Option>
-          <Option value="Gris">Gris</Option>
-        </Select>
-      </Form.Item>
+        <Form.Item label="Color" name="color" rules={validationRules.color}>
+          <Select>
+            <Option value="Rojo">Rojo</Option>
+            <Option value="Azul">Azul</Option>
+            <Option value="Verde">Verde</Option>
+            <Option value="Amarillo">Amarillo</Option>
+            <Option value="Negro">Negro</Option>
+            <Option value="Blanco">Blanco</Option>
+            <Option value="Naranja">Naranja</Option>
+            <Option value="Purpura">Púrpura</Option>
+            <Option value="Gris">Gris</Option>
+          </Select>
+        </Form.Item>
 
-      <Form.Item label="Tipo de combustible" name="fuelType" rules={validationRules.fuelType}>
-        <Select>
-          <Option value="Gasolina">Gasolina</Option>
-          <Option value="Diesel">Diesel</Option>
-          <Option value="Eléctrico">Eléctrico</Option>
-          <Option value="Híbrido">Híbrido</Option>
-        </Select>
-      </Form.Item>
+        <Form.Item label="Tipo de combustible" name="fuelType" rules={validationRules.fuelType}>
+          <Select>
+            <Option value="Gasolina">Gasolina</Option>
+            <Option value="Diesel">Diesel</Option>
+            <Option value="Eléctrico">Eléctrico</Option>
+            <Option value="Híbrido">Híbrido</Option>
+          </Select>
+        </Form.Item>
 
-      <Form.Item label="Kilometraje" name="mileage" rules={validationRules.mileage}>
-        <Input type="number" min={1} />
-      </Form.Item>
-    </Col>
-  </Row>
-</Form>
-
-
+        <Form.Item label="Kilometraje" name="mileage" rules={validationRules.mileage}>
+          <Input type="number" suffix="km" min={1} />
+        </Form.Item>
+      </Col>
+    </Row>
+  </Form>
     </Modal>
   );
 };

@@ -28,6 +28,12 @@ const CommonFields: React.FC<CommonFieldsProps> = ({ isEditing }) => (
         rules={[
           { required: true, message: 'Por favor ingrese su nombre' },
           { pattern: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, message: 'Ingrese un nombre válido' },
+          {
+            validator: (_, value) =>
+              value && value.trim() !== ""
+                ? Promise.resolve()
+                : Promise.reject(new Error("El campo no puede estar vacío")),
+          }
         ]}
       >
         <Input placeholder="Nombre" onKeyPress={(e) => /[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/.test(e.key) || e.preventDefault()}/>
@@ -40,6 +46,12 @@ const CommonFields: React.FC<CommonFieldsProps> = ({ isEditing }) => (
         rules={[
           { required: true, message: 'Por favor ingrese su apellido' },
           { pattern: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, message: 'Ingrese un apellido válido' },
+          {
+            validator: (_, value) =>
+              value && value.trim() !== ""
+                ? Promise.resolve()
+                : Promise.reject(new Error("El campo no puede estar vacío")),
+          }
         ]}
       >
         <Input placeholder="Apellido" onKeyPress={(e) => /[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/.test(e.key) || e.preventDefault()}/>
@@ -62,6 +74,12 @@ const CommonFields: React.FC<CommonFieldsProps> = ({ isEditing }) => (
           rules={[
             { required: true, message: 'Por favor ingresa una contraseña' },
             { min: 6, message: 'La contraseña debe tener al menos 6 caracteres' },
+            {
+              validator: (_, value) =>
+                value && value.trim() !== ""
+                  ? Promise.resolve()
+                  : Promise.reject(new Error("El campo no puede estar vacío")),
+            }
           ]}
         >
           <Input.Password prefix={<LockOutlined />} placeholder="Contraseña" />

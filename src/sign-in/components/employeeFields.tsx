@@ -68,7 +68,7 @@ const EmployeeFields: React.FC<EmployeeFieldsProps> = ({ isEditing }) =>{
       <Col span={12}>
         <Form.Item name="phone" label="Teléfono" rules={[{ required: true, message: 'Por favor ingrese su teléfono' },
           { validator: validatePhone },]}>
-          <Input placeholder="Teléfono" />
+          <Input placeholder="Teléfono" maxLength={10} onKeyPress={(e) => /[0-9]/.test(e.key) || e.preventDefault()}/>
         </Form.Item>
       </Col>
 
