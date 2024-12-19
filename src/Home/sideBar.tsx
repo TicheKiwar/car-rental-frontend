@@ -38,7 +38,8 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onLogout }) => {
           route: '/vehicle-management'
         },
         { key: 'modelos', label: 'Modelos', icon: <AppstoreAddOutlined />, route: '/model-management' },
-        { key: 'devolucion', label: 'Devolución de Autos', icon: <RedoOutlined />, route: '/return-vehicle' }, 
+        { key: 'devolucion', label: 'Devolución', icon: <RedoOutlined />, route: '/return-vehicle' }, 
+        { key: 'renta', label: 'Rentas', icon: <RedoOutlined />, route: '/rent-vehicle' }, 
       ] },
       {
         key: 'usuarios',
@@ -63,6 +64,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onLogout }) => {
             icon: <CrownOutlined />,
             route: '/admin-management',
           },
+          
           
         ],
       },
