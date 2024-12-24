@@ -1,0 +1,76 @@
+/* Sidebar */
+.ant-layout-sider {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    height: 100vh;
+  }
+  
+  /* Contenedor principal */
+  .ant-layout {
+    overflow: hidden;
+  }
+  
+  /* Header */
+  .ant-layout-header {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    background-color: #fff;
+    border-bottom: 1px solid #d9d9d9;
+  }
+  
+  /* Footer */
+  .ant-layout-footer {
+    text-align: center;
+    background-color: #f0f2f5;
+    padding: 16px;
+  }
+  
+/* Asegurar que el Sidebar esté pegado a la izquierda */
+.ant-layout-sider {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  height: 100vh;
+  z-index: 1000; /* Para evitar superposiciones no deseadas */
+}
+
+/* Ajustar el contenido para evitar que se solape con el Sidebar */
+.ant-layout {
+  overflow: hidden;
+}
+
+/* Forzar que el Footer quede al final */
+.ant-layout {
+  display: flex;
+  flex-direction: column;
+}
+
+.ant-layout-content {
+  flex: 1; /* El contenido ocupa todo el espacio disponible */
+}
+
+/* Footer estilizado */
+.ant-layout-footer {
+  background-color: #f0f2f5;
+  text-align: center;
+}
+
+.home-footer-sections {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.home-footer-sections div ul {
+  list-style: none;
+  padding: 0;
+}
+
+.home-footer-sections div h4 {
+  margin-bottom: 8px;
+}
