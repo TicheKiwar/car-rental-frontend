@@ -41,7 +41,7 @@ useEffect(() => {
       {/* Renderiza Sidebar solo cuando los datos están listos */}
       <Sidebar role={user.roleName} onLogout={handleLogout} />
 
-      <Layout style={{ marginLeft: 200 }}>
+      <Layout style={{ marginLeft: 70 }}>
         {/* Header */}
         <Header
       style={{

@@ -3,23 +3,22 @@ import { Modal, Button, Form, InputNumber, DatePicker, message, Descriptions } f
 import moment from "moment";
 import { IReservation } from "../types/reservation";
 import { Vehicle } from "../Vehicles/Ivehicle";
+import { createReservation } from "../services/reservation.service";
 
 interface ReservationModalProps {
     visible: boolean;
     onClose: () => void;
     onSave: (reservationData: {
-        reservationId?: number;
         reservationDate: string;
         reservationDays: number;
         totalCost: string;
-        vehicleId?: number;
-    }) => void;
+        vehicleId: number;  // Remove optional flag since it's required for new reservations
+    }) => Promise<void>;  // Update return type to Promise<void>
     reservation?: IReservation | null;
     vehicle?: Vehicle;
     isEditable?: boolean;
     isNew?: boolean;
 }
-
 const ReservationModal: React.FC<ReservationModalProps> = ({
     visible,
     onClose,
@@ -32,7 +31,7 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
     const [form] = Form.useForm();
     const [reservationDate, setReservationDate] = useState<moment.Moment | null>(null);
     const [reservationDays, setReservationDays] = useState<number>(0);
-    const [totalCost, setTotalCost] = useState<string>("");
+    const [totalCost, setTotalCost] = useState<string>("0.00");
 
     useEffect(() => {
         if (visible) {
@@ -40,7 +39,7 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
                 setReservationDate(moment(reservation.reservationDate));
                 setReservationDays(reservation.reservationDays);
                 setTotalCost(reservation.totalCost.toString());
-                
+
                 form.setFieldsValue({
                     reservationDate: moment(reservation.reservationDate),
                     reservationDays: reservation.reservationDays,
@@ -50,27 +49,44 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
                 form.resetFields();
                 setReservationDate(null);
                 setReservationDays(0);
-                setTotalCost("");
+                setTotalCost("0.00");
             }
         }
     }, [visible, reservation, form]);
 
     const calculateTotalCost = (days: number) => {
         const selectedVehicle = reservation?.vehicle || vehicle;
-        if (selectedVehicle) {
-            const pricePerDay = selectedVehicle.dailyRate;
-            const total = days * pricePerDay;
-            setTotalCost(total.toFixed(2));
+        if (!selectedVehicle) {
+            message.error("No se encontró el vehículo para calcular el costo total.");
+            return "0.00";
         }
+
+        const pricePerDay = parseFloat(selectedVehicle.dailyRate.toString());
+        if (isNaN(pricePerDay)) {
+            message.error("La tarifa diaria no es válida.");
+            return "0.00";
+        }
+
+        const total = days * pricePerDay;
+        return total.toFixed(2);
     };
 
     const handleDayChange = (value: number | null) => {
-        if (value !== null) {
-            setReservationDays(value);
-            calculateTotalCost(value);
+        if (value === null || value < 0) {
+            setReservationDays(0);
+            setTotalCost("0.00");
+            return;
         }
-    };
 
+        const days = Math.floor(value); // Aseguramos que sea un número entero
+        setReservationDays(days);
+        const newTotalCost = calculateTotalCost(days);
+        setTotalCost(newTotalCost);
+        
+        // Actualizar el campo del formulario
+        form.setFieldsValue({ totalCost: newTotalCost });
+    };
+    // Update the handleSave function in ReservationModal component
     const handleSave = async () => {
         try {
             await form.validateFields();
@@ -83,21 +99,26 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
                 message.error("El número de días debe ser mayor a 0.");
                 return;
             }
+            if (!vehicle?.vehicleId) {
+                message.error("No se ha seleccionado un vehículo.");
+                return;
+            }
 
             const reservationData = {
-                ...(reservation && { reservationId: reservation.reservationId }),
                 reservationDate: reservationDate.format("YYYY-MM-DD"),
                 reservationDays,
                 totalCost,
-                ...(vehicle && { vehicleId: vehicle.vehicleId })
+                vehicleId: vehicle.vehicleId
             };
 
-            onSave(reservationData);
+            await onSave(reservationData);
             onClose();
         } catch (error) {
             message.error("Por favor, completa todos los campos requeridos.");
         }
     };
+
+
 
     const selectedVehicle = reservation?.vehicle || vehicle;
     if (!selectedVehicle) return null;
@@ -141,7 +162,7 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
 
             <div style={{ marginTop: "20px" }}>
                 <Form form={form} layout="vertical">
-                    <Form.Item 
+                    <Form.Item
                         label="Fecha de Reserva"
                         name="reservationDate"
                         rules={[{ required: true, message: "Por favor selecciona una fecha" }]}
@@ -159,7 +180,7 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
                             onChange={(date) => setReservationDate(date)}
                         />
                     </Form.Item>
-                    <Form.Item 
+                    <Form.Item
                         label="Días de Reserva"
                         name="reservationDays"
                         rules={[{ required: true, message: "Por favor ingresa el número de días" }]}
@@ -172,12 +193,12 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
                             style={{ width: "100%" }}
                         />
                     </Form.Item>
-                    <Form.Item 
+                    <Form.Item
                         label="Total"
                         name="totalCost"
                     >
                         <InputNumber
-                            value={totalCost}
+                            value={Number(totalCost)} // Convierte a número
                             disabled
                             style={{
                                 width: "100%",
@@ -185,9 +206,10 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
                                 fontSize: "16px",
                                 color: "#4CAF50",
                             }}
-                            prefix="$"
+                            formatter={(value) => `$ ${value}`}
                         />
                     </Form.Item>
+
                 </Form>
             </div>
         </Modal>
