@@ -29,7 +29,7 @@ const Login: React.FC = () => {
           } else if (dataUser.data.role.roleId === 1) {
             navigate("/vehicle-management");
           } else if (dataUser.data.role.roleId === 2) {
-            navigate("/Home");
+            navigate("/client-management");
           }
         }
       }

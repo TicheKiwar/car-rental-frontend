@@ -68,7 +68,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onLogout }) => {
       },
       ],
       Empleado: [
-        { key: 'alquiler', label: 'Alquiler de Autos', icon: <CarOutlined />, route: '/Home' },
+        // { key: 'alquiler', label: 'Alquiler de Autos', icon: <CarOutlined />, route: '/' },
         {
           key: 'clientes',
           label: 'Clientes',
