@@ -1,12 +1,11 @@
 import { message } from "antd";
-import { Vehicle, VehicleModel } from "../Vehicles/Ivehicle";
 import { api } from "./api.service";
 import { IRental } from "../types/rentail";
-import { IReservation } from "../types/reservation";
+import { IVerify, IVerifyResponse } from "../types/Verify";
 
-export const fetchReservations = async (): Promise<IReservation[]> => {
+export const fetchReservations = async (): Promise<IRental[]> => {
     const token = localStorage.getItem("authToken");
-    const response = await api.get(`/reservations/Client`,{
+    const response = await api.get(`/rental/client`,{
         headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -14,25 +13,28 @@ export const fetchReservations = async (): Promise<IReservation[]> => {
     const data = response.data;
 
     return data.map((reservation: any) => ({
-        reservationId: reservation.reservationId,
-        reservationDate: reservation.reservationDate,
-        reservationDays: reservation.reservationDays,
-        totalCost: reservation.totalCost,
+        rentalID: reservation.rentalId,
+        rentalDate: reservation.rentalDate,
+        rentalDays: reservation.rentalDays,
         vehicle: reservation.vehicle,
-        rentals: reservation.rentals,
+        createdAt: reservation.createdAt,
+        status: reservation.status,
     }));
 };
 
-export const verifyReservation = async (reservationID: number): Promise<IReservation[]> => {
+export const verifyReservation = async (verify:IVerify): Promise<IVerifyResponse> => {
     const token = localStorage.getItem("authToken");
-    const response = await api.get(`/reservations/Verify/${reservationID}`,{
+    const response = await api.get(`/rental/verify`,{
         headers: {
             Authorization: `Bearer ${token}`,
           },
     });
     const data = response.data;
 
-    return data.map((reservation: any) => ({
+    return data.map((verify: any) => ({
+        verifyHour: verify.verifyHour,
+        verifyDate: verify.verifyDate,
+        verifyMark: verify.verifyMark,
     }));
 };
 
@@ -76,7 +78,7 @@ export const createReservation = async (reservation: any): Promise<boolean> => {
 export const updateReservation = async (reservationId: number, reservationData: any): Promise<any> => {
     try {
         const token = localStorage.getItem("authToken");
-        const response = await api.patch(`/reservations/${reservationId}`, reservationData, {
+        const response = await api.patch(`/rental/${reservationId}`, reservationData, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -88,7 +90,7 @@ export const updateReservation = async (reservationId: number, reservationData: 
 };
 export const deleteReservation = async (reservationID: number) => {
     try {
-        await api.delete(`/reservations/${reservationID}`);
+        await api.delete(`/rental/${reservationID}`);
         message.success("Reserva eliminado con éxito.");
     } catch (error) {
         message.error("Error al eliminar la Reserva.");
