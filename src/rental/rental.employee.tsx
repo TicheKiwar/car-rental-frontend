@@ -1,26 +1,27 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Button, Form, InputNumber, DatePicker, message, Descriptions } from "antd";
+import { Modal, Button, Form, InputNumber, DatePicker, message, Descriptions, Input } from "antd";
 import moment from "moment";
 import { Vehicle } from "../Vehicles/Ivehicle";
 import { IRental } from "../types/rentail";
+import { Client } from "../types/Client";
+import { getClientByDni } from "../services/client.service";
 
 interface ReservationModalProps {
     visible: boolean;
     onClose: () => void;
     onSave: (reservationData: {
-        reservationId?: number;
         reservationDate: string;
         reservationDays: number;
-        totalCost: string;
+        clientID: number;
         vehicleId?: number;
-    }) => void;
+    }) => Promise<void>;
     reservation?: IRental | null;
     vehicle?: Vehicle;
     isEditable?: boolean;
     isNew?: boolean;
 }
 
-const ReservationModal: React.FC<ReservationModalProps> = ({
+const ReservationEmployeeModal: React.FC<ReservationModalProps> = ({
     visible,
     onClose,
     onSave,
@@ -32,56 +33,105 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
     const [form] = Form.useForm();
     const [reservationDate, setReservationDate] = useState<moment.Moment | null>(null);
     const [reservationDays, setReservationDays] = useState<number>(0);
-    const [totalCost, setTotalCost] = useState<string>("");
+    const [totalCost, setTotalCost] = useState<string>("0.00");
+    const [client, setClient] = useState<Client | null>(null);
+    const [isLoadingClient, setIsLoadingClient] = useState<boolean>(false);
 
+    // Efecto para cargar los datos iniciales
     useEffect(() => {
         if (visible) {
             if (reservation) {
-                setReservationDate(moment(reservation.rentalDate));
-                setReservationDays(reservation.rentalDays);
-                calculateTotalCost(reservation.rentalDays);
+                // Convertir la fecha usando moment
+                const reservationMoment = moment(reservation.rentalDate);
                 
+                // Actualizar los estados
+                setReservationDate(reservationMoment);
+                setReservationDays(reservation.rentalDays);
+                setClient(reservation.client || null);
+                
+                // Calcular el costo total
+                const cost = (reservation.rentalDays * reservation.vehicle.dailyRate).toFixed(2);
+                setTotalCost(cost);
+
+                // Actualizar todos los campos del formulario
                 form.setFieldsValue({
-                    reservationDate: moment(reservation.rentalDate),
+                    dni: reservation.client?.dni || '',
+                    name: `${reservation.client?.firstName || ''} ${reservation.client?.lastName || ''}`.trim(),
+                    reservationDate: reservationMoment,
                     reservationDays: reservation.rentalDays,
+                    totalCost: cost
                 });
             } else {
+                // Resetear el formulario y los estados para una nueva reserva
                 form.resetFields();
                 setReservationDate(null);
                 setReservationDays(0);
-                setTotalCost("");
+                setTotalCost("0.00");
+                setClient(null);
             }
         }
     }, [visible, reservation, form]);
+    
+    const handleDniChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const dni = event.target.value.trim();
+        form.setFieldsValue({ name: '' });
+        setClient(null);
 
-    // Asegurarse de que el cálculo se realice cuando cambie el número de días
-    useEffect(() => {
-        calculateTotalCost(reservationDays);
-    }, [reservationDays]);
-
-    const calculateTotalCost = (days: number) => {
-        const selectedVehicle = reservation?.vehicle || vehicle;
-        if (selectedVehicle && days > 0) {
-            const pricePerDay = selectedVehicle.dailyRate;
-            const total = days * pricePerDay;
-            setTotalCost(total.toFixed(2));
-            form.setFieldValue('totalCost', total.toFixed(2));
-        } else {
-            setTotalCost("0.00");
-            form.setFieldValue('totalCost', "0.00");
+        if (dni.length >= 10) {
+            setIsLoadingClient(true);
+            try {
+                const clientData = await getClientByDni(dni);
+                if (clientData) {
+                    setClient(clientData);
+                    form.setFieldsValue({ 
+                        name: `${clientData.firstName} ${clientData.lastName}`
+                    });
+                    message.success("Cliente encontrado");
+                }
+            } catch (error) {
+                message.error("No se encontró un cliente con esa cédula");
+                form.setFieldsValue({ name: '' });
+                setClient(null);
+            } finally {
+                setIsLoadingClient(false);
+            }
         }
     };
 
+    const calculateTotalCost = (days: number) => {
+        const selectedVehicle = reservation?.vehicle || vehicle;
+        if (!selectedVehicle) {
+            message.error("No se encontró el vehículo para calcular el costo total.");
+            return "0.00";
+        }
+
+        const pricePerDay = parseFloat(selectedVehicle.dailyRate.toString());
+        if (isNaN(pricePerDay)) {
+            message.error("La tarifa diaria no es válida.");
+            return "0.00";
+        }
+
+        const total = days * pricePerDay;
+        return total.toFixed(2);
+    };
+
     const handleDayChange = (value: number | null) => {
-        const days = value || 0;
+        if (value === null || value < 0) {
+            setReservationDays(0);
+            setTotalCost("0.00");
+            return;
+        }
+
+        const days = Math.floor(value);
         setReservationDays(days);
-        // El cálculo se realizará automáticamente por el useEffect
+        const newTotalCost = calculateTotalCost(days);
+        setTotalCost(newTotalCost);
+        form.setFieldsValue({ totalCost: newTotalCost });
     };
 
     const handleSave = async () => {
         try {
             await form.validateFields();
-
             if (!reservationDate) {
                 message.error("Por favor, selecciona una fecha de reserva.");
                 return;
@@ -90,16 +140,19 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
                 message.error("El número de días debe ser mayor a 0.");
                 return;
             }
+            
+            if (!client?.clientId) {
+                message.error("Por favor, seleccione un cliente válido.");
+                return;
+            }
 
             const reservationData = {
-                
                 reservationDate: reservationDate.format("YYYY-MM-DD"),
                 reservationDays,
-                totalCost,
-                
+                clientID: client.clientId
             };
 
-            onSave(reservationData);
+            await onSave(reservationData);
             onClose();
         } catch (error) {
             message.error("Por favor, completa todos los campos requeridos.");
@@ -138,9 +191,9 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
                 <Descriptions.Item label="Tipo">
                     {selectedVehicle.type}
                 </Descriptions.Item>
-                {/* <Descriptions.Item label="Placa">
+                <Descriptions.Item label="Placa">
                     {selectedVehicle.licensePlate}
-                </Descriptions.Item> */}
+                </Descriptions.Item>
                 <Descriptions.Item label="Tarifa Diaria" span={2}>
                     ${selectedVehicle.dailyRate}
                 </Descriptions.Item>
@@ -148,14 +201,36 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
 
             <div style={{ marginTop: "20px" }}>
                 <Form form={form} layout="vertical">
-                    <Form.Item 
+                    <Form.Item
+                        label="Cedula de Cliente"
+                        name="dni"
+                        rules={[{ required: true, message: "Por favor ingresa un numero de cedula valido" }]}
+                    >
+                        <Input
+                            onChange={handleDniChange}
+                            disabled={!isNew || !isEditable}
+                            minLength={10}
+                            maxLength={13}
+                            style={{ width: "100%" }}
+                        />
+                    </Form.Item>
+                    <Form.Item
+                        label="Nombre del Cliente"
+                        name="name"
+                    >
+                        <Input
+                            disabled={true}
+                            style={{ width: "100%" }}
+                            loading={isLoadingClient}
+                        />
+                    </Form.Item>
+                    <Form.Item
                         label="Fecha de Reserva"
                         name="reservationDate"
                         rules={[{ required: true, message: "Por favor selecciona una fecha" }]}
                     >
                         <DatePicker
                             style={{ width: "100%" }}
-                            value={reservationDate}
                             disabled={!isEditable}
                             disabledDate={(current) => {
                                 if (reservation?.rentalDate) {
@@ -166,25 +241,23 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
                             onChange={(date) => setReservationDate(date)}
                         />
                     </Form.Item>
-                    <Form.Item 
+                    <Form.Item
                         label="Días de Reserva"
                         name="reservationDays"
                         rules={[{ required: true, message: "Por favor ingresa el número de días" }]}
                     >
                         <InputNumber
-                            value={reservationDays}
-                            onChange={handleDayChange}
                             disabled={!isEditable}
                             min={1}
                             style={{ width: "100%" }}
+                            onChange={handleDayChange}
                         />
                     </Form.Item>
-                    <Form.Item 
+                    <Form.Item
                         label="Total"
                         name="totalCost"
                     >
                         <InputNumber
-                            value={totalCost}
                             disabled
                             style={{
                                 width: "100%",
@@ -192,9 +265,7 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
                                 fontSize: "16px",
                                 color: "#4CAF50",
                             }}
-                            prefix="$"
-                            formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                            parser={value => value!.replace(/\$\s?|(,*)/g, '')}
+                            formatter={(value) => `$ ${value}`}
                         />
                     </Form.Item>
                 </Form>
@@ -203,4 +274,4 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
     );
 };
 
-export default ReservationModal;
+export default ReservationEmployeeModal;

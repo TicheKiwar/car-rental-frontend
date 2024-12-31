@@ -1,54 +1,71 @@
 import React, { useState, useEffect } from "react";
-import { Input, Table, Button, Space, message, Modal } from "antd";
+import { Table, Button, Space, message, Modal, Input } from "antd";
 import {
   EditOutlined,
   DeleteOutlined,
-  InfoCircleOutlined,
-} from "@ant-design/icons";
-import { deleteReservation, fetchReservations, verifyReservation, updateReservation } from "../services/reservation.service";
-import { IReservation } from "../types/reservation";
 
-const ReservationManagement = () => {
-  const [allReservations, setAllReservations] = useState<IReservation[]>([]);
-  const [tableData, setTableData] = useState<IReservation[]>([]);
+  DollarOutlined,
+  CheckCircleFilled,
+
+} from "@ant-design/icons";
+import { IRental } from "../types/rentail";
+import { IVerify } from "../types/Verify";
+import ReservationEmployeeModal from "./rental.employee";
+import { deleteRental, fetchRental, updateRental } from "../services/rental.service";
+import { verifyReservation } from "../services/reservation.service";
+
+const RentalManagement = () => {
+  const [allReservations, setAllReservations] = useState<IRental[]>([]);
+  const [tableData, setTableData] = useState<IRental[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedReservation, setSelectedReservation] = useState<IReservation | null>(null);
+  const [selectedReservation, setSelectedReservation] = useState<IRental | null>(null);
   const [deleteReservationId, setDeleteReservationId] = useState<number | null>(null);
   const [isConfirmDeleteModalVisible, setIsConfirmDeleteModalVisible] = useState(false);
+  const [dniFilter, setDniFilter] = useState<string>(''); 
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const reservations = await fetchReservations();
-        setAllReservations(reservations);
-        setTableData(reservations);
+        const reservations = await fetchRental();
+        const filteredReservations = reservations.filter(reservation => reservation.status !== 'CANCELADO');
+        setAllReservations(filteredReservations);
+        setTableData(filteredReservations);
       } catch (error) {
-       console.log("Error al cargar las reservas.");
+        console.log("Error al cargar las reservas.");
       }
     };
     fetchData();
   }, []);
 
-  const verifyReservationStatus = async (reservationId: number): Promise<boolean> => {
+  const handleDniFilter = (dni: string) => {
+    setDniFilter(dni);
+    const filteredData = allReservations.filter((reservation) =>
+      reservation.client.dni.includes(dni)
+    );
+    setTableData(filteredData);
+  };
+
+  const verifyReservationStatus = async (verify: IVerify): Promise<boolean> => {
     try {
-      const verificationResult = await verifyReservation(reservationId);
-      return verificationResult.length === 0;
+      const verificationResult = await verifyReservation(verify);
+      return verificationResult.verifyDate || verificationResult.verifyHour
     } catch (error) {
-      message.error("Error al verificar el estado de la reserva.");
       return false;
     }
   };
 
   const handleSaveReservation = async (reservationData: any) => {
     try {
+      console.log("Reservation Data", reservationData);
       if (selectedReservation) {
         // Update existing reservation
-        await updateReservation(selectedReservation.reservationId, reservationData);
+        console.log("Updating reservation", selectedReservation.rentalId);
+        await updateRental(selectedReservation.rentalId, reservationData);
         message.success("Reserva actualizada exitosamente");
       }
 
       // Refresh the reservations list
-      const updatedReservations = await fetchReservations();
+      const updatedReservations = await fetchRental();
       setAllReservations(updatedReservations);
       setTableData(updatedReservations);
       setIsModalVisible(false);
@@ -58,36 +75,40 @@ const ReservationManagement = () => {
       setSelectedReservation(null);
     }
   };
-
   const handleEdit = async (reservationId: number) => {
     try {
-      const canEdit = await verifyReservationStatus(reservationId);
-      if (!canEdit) {
-        message.warning("Esta reserva no puede ser modificada porque tiene rentas asociadas.");
+      console.log("Edit reservation", reservationId);
+      const reservationToEdit = allReservations.find((reservation) => reservation.rentalId === reservationId);
+
+      if (!reservationToEdit) {
+        message.error("Reserva no encontrada.");
         return;
       }
 
-      const reservationToEdit = allReservations.find(
-        (reservation) => reservation.reservationId === reservationId
-      );
-      if (reservationToEdit) {
-        setSelectedReservation(reservationToEdit);
-        setIsModalVisible(true);
+      const canEdit = await verifyReservationStatus({
+        createdAt: reservationToEdit.createdAt,
+        rentalDate: reservationToEdit.rentalDate,
+      });
+
+      if (!canEdit) {
+        return;
       }
+
+      setSelectedReservation(reservationToEdit);
+      setIsModalVisible(true);
     } catch (error) {
       message.error("Error al verificar la reserva.");
     }
   };
 
-  const handleDelete = async (reservation: IReservation) => {
+  const handleDelete = async (reservation: IRental) => {
+    console.log("Can delete ", (reservation.status === "En curso"));
     try {
-      const canDelete = await verifyReservationStatus(reservation.reservationId);
-      if (!canDelete) {
-        message.warning("Esta reserva no puede ser eliminada porque tiene rentas asociadas.");
+      const canDelete = (reservation.status === "En curso");
+      if (canDelete) {
         return;
       }
-
-      setDeleteReservationId(reservation.reservationId);
+      setDeleteReservationId(reservation.rentalId);
       setIsConfirmDeleteModalVisible(true);
     } catch (error) {
       message.error("Error al verificar la reserva.");
@@ -97,9 +118,9 @@ const ReservationManagement = () => {
   const confirmDelete = async () => {
     if (deleteReservationId !== null) {
       try {
-        await deleteReservation(deleteReservationId);
+        await deleteRental(deleteReservationId);
         const updatedReservations = allReservations.filter(
-          (reservation) => reservation.reservationId !== deleteReservationId
+          (reservation) => reservation.rentalId !== deleteReservationId
         );
         setAllReservations(updatedReservations);
         setTableData(updatedReservations);
@@ -111,38 +132,35 @@ const ReservationManagement = () => {
     setDeleteReservationId(null);
   };
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.toLowerCase();
-    if (value === "") {
-      setTableData(allReservations);
-    } else {
-      setTableData(
-        allReservations.filter((item) =>
-          item.vehicle.licensePlate.toLowerCase().includes(value)
-        )
-      );
-    }
-  };
 
-  const ActionButtons: React.FC<{ record: IReservation }> = ({ record }) => {
+  const ActionButtons: React.FC<{ record: IRental }> = ({ record }) => {
     const [isVerifying, setIsVerifying] = useState(true);
     const [canModify, setCanModify] = useState(false);
+    const [canDelete, setCanDelete] = useState(false);
 
     useEffect(() => {
       const checkReservation = async () => {
         setIsVerifying(true);
-        const result = await verifyReservationStatus(record.reservationId);
+        const result = await verifyReservationStatus({
+          createdAt: record.createdAt,
+          rentalDate: record.rentalDate,
+        });
+        const canCancel = (record.status === "En curso");
+        if (canCancel) {
+          setCanDelete(false);
+        }
+        setCanDelete(true);
         setCanModify(result);
         setIsVerifying(false);
       };
       checkReservation();
-    }, [record.reservationId]);
+    }, [record]);
 
     return (
       <Space size="middle">
         <Button
           icon={<EditOutlined />}
-          onClick={() => handleEdit(record.reservationId)}
+          onClick={() => handleEdit(record.rentalId)}
           shape="circle"
           size="small"
           title="Editar"
@@ -153,15 +171,23 @@ const ReservationManagement = () => {
           onClick={() => handleDelete(record)}
           shape="circle"
           size="small"
-          title="Eliminar"
-          disabled={isVerifying || !canModify || allReservations.length === 0}
+          title="Cancelar"
+          disabled={!canDelete}
         />
         <Button
-          icon={<InfoCircleOutlined />}
+          icon={<CheckCircleFilled />}
+          onClick={() => handleDelete(record)}
+          shape="circle"
+          size="small"
+          title="Marcar Retiro"
+          disabled={!canDelete}
+        />
+        <Button
+          icon={<DollarOutlined style={{ color: "green", }} />}
           onClick={() => setSelectedReservation(record)}
           shape="circle"
           size="small"
-          title="Información"
+          title="Pagar"
         />
       </Space>
     );
@@ -169,9 +195,14 @@ const ReservationManagement = () => {
 
   const columns = [
     {
+      title: "Cliente",
+      key: "client",
+      render: (_: any, record: IRental) => <span>{record.client.dni}</span>,
+    },
+    {
       title: "Vehiculo",
       key: "vehicleImage",
-      render: (_: any, record: IReservation) => (
+      render: (_: any, record: IRental) => (
         <img
           src={record.vehicle.image}
           alt={record.vehicle.model.modelName}
@@ -179,68 +210,81 @@ const ReservationManagement = () => {
         />
       ),
     },
+
     {
       title: "Modelo",
       key: "vehicleModel",
-      render: (_: any, record: IReservation) => <span>{record.vehicle.model.modelName}</span>,
+      render: (_: any, record: IRental) => <span>{record.vehicle.model.modelName}</span>,
     },
     {
       title: "Marca",
       key: "vehicleBrand",
-      render: (_: any, record: IReservation) => <span>{record.vehicle.model.brand.brandName}</span>,
+      render: (_: any, record: IRental) => <span>{record.vehicle.model.brand.brandName}</span>,
     },
     {
       title: "Tipo",
       key: "vehicleType",
-      render: (_: any, record: IReservation) => <span>{record.vehicle.type}</span>,
+      render: (_: any, record: IRental) => <span>{record.vehicle.type}</span>,
     },
     {
       title: "Costo Dia",
       key: "DailyRate",
-      render: (_: any, record: IReservation) => <span>{record.vehicle.dailyRate}</span>,
+      render: (_: any, record: IRental) => <span>{record.vehicle.dailyRate}</span>,
     },
     {
-      title: "Fecha de Reserva",
+      title: "Fecha de Alquiler",
       dataIndex: "reservationDate",
       key: "reservationDate",
+      render: (_: any, record: IRental) => <span>{record.rentalDate}</span>,
     },
     {
-      title: "Días de Reserva",
+      title: "Días",
       dataIndex: "reservationDays",
       key: "reservationDays",
+      render: (_: any, record: IRental) => <span>{record.rentalDays}</span>,
     },
     {
-      title: "Costo Total",
+      title: "Estado Renta",
+      dataIndex: "status",
+      key: "status",
+      render: (_: any, record: IRental) => <span>{record.status}</span>,
+    },
+    {
+      title: "Costo",
       dataIndex: "totalCost",
       key: "totalCost",
-      render: (cost: string) => `$${cost}`,
+      render: (_: any, record: IRental) => <span style={{ color: "green" }}> $ {record.rentalDays * record.vehicle.dailyRate}</span>,
     },
     {
       title: "Acciones",
       key: "actions",
-      render: (_: any, record: IReservation) => <ActionButtons record={record} />,
+      render: (_: any, record: IRental) => <ActionButtons record={record} />,
     },
   ];
 
   return (
     <div style={{ padding: "20px", backgroundColor: "white" }}>
       <h1>Administración de Reservas</h1>
-      {/* <Input.Search
-        placeholder="Buscar reservas"
-        onChange={handleSearch}
-        style={{ width: "300px", marginBottom: "20px" }} */}
-      {/* /> */}
+      {/* Filtro por DNI */}
+
+      <Input
+        placeholder="Buscar por DNI"
+        value={dniFilter}
+        onChange={(e) => handleDniFilter(e.target.value)}
+        style={{ marginBottom: "10px", width: "200px" }}
+      />
+
       <Table
-        dataSource={tableData.map((item) => ({ ...item, key: item.reservationId }))}
+        dataSource={tableData.map((item) => ({ ...item, key: item.rentalId }))}
         columns={columns}
       />
-      {/* <ReservationModal
+      <ReservationEmployeeModal
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
         onSave={handleSaveReservation}
         reservation={selectedReservation}
         isEditable={true}
-      /> */}
+      />
       <Modal
         title="Confirmación"
         open={isConfirmDeleteModalVisible}
@@ -249,10 +293,10 @@ const ReservationManagement = () => {
         okText="Sí"
         cancelText="No"
       >
-        <p>¿Estás seguro de que deseas Canselar esta renta?</p>
+        <p>¿Estás seguro de que deseas Cancelar esta reserva?</p>
       </Modal>
     </div>
   );
 };
 
-export default ReservationManagement;
+export default RentalManagement;

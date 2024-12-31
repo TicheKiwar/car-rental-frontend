@@ -12,6 +12,7 @@ import ReturnManagment from "./ReturnVehicle/ReturnManagment";
 import ClientsManagement from "./Users/clients.page";
 import EmployeesManagement from "./Users/employees.page";
 import ReservationManagement from "./reservations/reservations";
+import RentalManagement from "./rental/rental";
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
           <Route path="/employee-management" element={<EmployeesManagement />} />
           <Route path="/admin-management" element={<ModelManagement />} />
           <Route path="/Reservations" element={<ReservationManagement />} />
+          <Route path="/rent-vehicle" element={<RentalManagement />} />
         </Route>
       </Routes>
     </Router>

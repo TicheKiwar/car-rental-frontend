@@ -24,8 +24,9 @@ const ReservationManagement = () => {
     const fetchData = async () => {
       try {
         const reservations = await fetchReservations();
-        setAllReservations(reservations);
-        setTableData(reservations);
+        const filteredReservations = reservations.filter(reservation => reservation.status !== 'CANCELADO');
+        setAllReservations(filteredReservations);
+        setTableData(filteredReservations);
       } catch (error) {
        console.log("Error al cargar las reservas.");
       }
@@ -44,8 +45,10 @@ const ReservationManagement = () => {
 
   const handleSaveReservation = async (reservationData: any) => {
     try {
+      console.log("Reservation Data", reservationData);
       if (selectedReservation) {
         // Update existing reservation
+        console.log("Updating reservation", selectedReservation.rentalId);
         await updateReservation(selectedReservation.rentalId, reservationData);
         message.success("Reserva actualizada exitosamente");
       }
@@ -61,35 +64,39 @@ const ReservationManagement = () => {
       setSelectedReservation(null);
     }
   };
-
-  const handleEdit = async (verify:IVerify) => {
+  const handleEdit = async (reservationId: number) => {
     try {
-      const canEdit = await verifyReservationStatus(verify);
-      if (!canEdit) {
-        message.warning("Esta reserva no puede ser modificada porque tiene rentas asociadas.");
+      console.log("Edit reservation", reservationId);
+      const reservationToEdit = allReservations.find((reservation) => reservation.rentalId === reservationId);
+  
+      if (!reservationToEdit) {
+        message.error("Reserva no encontrada.");
         return;
       }
-
-      const reservationToEdit = allReservations.find(
-        (reservation) => reservation.rentalId === reservationId
-      );
-      if (reservationToEdit) {
-        setSelectedReservation(reservationToEdit);
-        setIsModalVisible(true);
+  
+      const canEdit = await verifyReservationStatus({
+        createdAt: reservationToEdit.createdAt,
+        rentalDate: reservationToEdit.rentalDate,
+      });
+  
+      if (!canEdit) {
+        return;
       }
+  
+      setSelectedReservation(reservationToEdit);
+      setIsModalVisible(true);
     } catch (error) {
       message.error("Error al verificar la reserva.");
     }
   };
-
+  
   const handleDelete = async (reservation: IRental) => {
+    console.log("Can delete ", (reservation.status === "En curso"));
     try {
-      const canDelete = await verifyReservationStatus();
-      if (!canDelete) {
-        message.warning("Esta reserva no puede ser eliminada porque tiene rentas asociadas.");
+      const canDelete = (reservation.status === "En curso");
+      if (canDelete) {
         return;
       }
-
       setDeleteReservationId(reservation.rentalId);
       setIsConfirmDeleteModalVisible(true);
     } catch (error) {
@@ -114,32 +121,29 @@ const ReservationManagement = () => {
     setDeleteReservationId(null);
   };
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.toLowerCase();
-    if (value === "") {
-      setTableData(allReservations);
-    } else {
-      setTableData(
-        allReservations.filter((item) =>
-          item.vehicle.licensePlate.toLowerCase().includes(value)
-        )
-      );
-    }
-  };
 
   const ActionButtons: React.FC<{ record: IRental }> = ({ record }) => {
     const [isVerifying, setIsVerifying] = useState(true);
     const [canModify, setCanModify] = useState(false);
-
+    const [canDelete, setCanDelete] = useState(false);
+  
     useEffect(() => {
       const checkReservation = async () => {
         setIsVerifying(true);
-        const result = await verifyReservationStatus();
+        const result = await verifyReservationStatus({
+          createdAt: record.createdAt,
+          rentalDate: record.rentalDate,
+        });
+        const canCancel = (record.status === "En curso");
+        if (canCancel) {
+          setCanDelete(false);
+        }
+        setCanDelete(true);
         setCanModify(result);
         setIsVerifying(false);
       };
       checkReservation();
-    }, [record.rentalId]);
+    }, [record]);
 
     return (
       <Space size="middle">
@@ -157,7 +161,7 @@ const ReservationManagement = () => {
           shape="circle"
           size="small"
           title="Cancelar"
-          disabled={isVerifying || !canModify || allReservations.length === 0}
+          disabled={!canDelete}
         />
         <Button
           icon={<DollarOutlined style={{color:"green",}}/>}

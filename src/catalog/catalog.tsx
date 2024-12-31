@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { Card, Col, Row, Modal, Button, Input, Select, Drawer, Slider, InputNumber } from "antd";
+import { Card, Col, Row, Modal, Button, Input, Select, Drawer, InputNumber } from "antd";
 import { ClearOutlined, DollarOutlined, PlusOutlined, SettingOutlined } from '@ant-design/icons';
 import { fetchCatalog } from "../services/catalog.service";
 import { Vehicle } from "../Vehicles/Ivehicle";
 import VehicleInfoModal from "./catalog.info";
 import NewReservationModal from "../reservations/NewReservationModal";
 import { createReservation } from "../services/reservation.service";
+import { createRental } from "../services/rental.service"; 
+
+import ReservationEmployeeModal from "../rental/rental.employee";
 
 const { Meta } = Card;
 const { Option } = Select;
-
-const VehicleCatalog: React.FC = () => {
+type Role = 'Administrador' | 'Empleado' | 'Cliente' | 'inv';
+interface VehicleCatalogProps {
+  role?: Role
+}
+const VehicleCatalog: React.FC<VehicleCatalogProps> = ({ role}) => {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [filteredVehicles, setFilteredVehicles] = useState<Vehicle[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
@@ -28,7 +34,6 @@ const VehicleCatalog: React.FC = () => {
     doorCount: Math.max(...vehicles.map(v => v.doorCount)),
     mileage: Math.max(...vehicles.map(v => v.mileage))
   });
-
   const [maxValues, setMaxValues] = useState({
     dailyRate: 0,
     capacity: 0,
@@ -36,7 +41,13 @@ const VehicleCatalog: React.FC = () => {
     doorCount: 0,
     mileage: 0
   });
+  const canMakeReservation = (userRole: Role): boolean => {
+    return ['Administrador', 'Empleado', 'Cliente'].includes(userRole);
+  };
 
+  const canAccessAdvancedFilters = (userRole: Role): boolean => {
+    return ['Administrador', 'Empleado'].includes(userRole);
+  };
   const getInitialAdvancedFilters = (maxVals: typeof maxValues) => ({
     dailyRate: [0, maxVals.dailyRate],
     capacity: [0, maxVals.capacity],
@@ -90,6 +101,7 @@ const VehicleCatalog: React.FC = () => {
     loadVehiclesAndSetMaxValues();
   }, []);
 
+
   const handleCardClick = (vehicle: Vehicle) => {
     setSelectedVehicle(vehicle);
     setIsInfoModalOpen(true);
@@ -101,8 +113,21 @@ const VehicleCatalog: React.FC = () => {
     setIsInfoModalOpen(false);
     setIsReservationModalOpen(false);
   };
-
+  const getReservationComponent = (userRole: Role) => {
+    if (userRole === 'Empleado' || userRole === 'Administrador') {
+      return ReservationEmployeeModal;
+    }
+    return NewReservationModal;
+  };
+  const ReservationComponent = getReservationComponent(role);
   const handleReservationModalOpen = (vehicle: Vehicle) => {
+    if (!canMakeReservation(role)) {
+      Modal.error({
+        title: 'Acceso Denegado',
+        content: 'Debe iniciar sesión para realizar una reserva.',
+      });
+      return;
+    }
     setSelectedVehicle(vehicle);
     setIsReservationModalOpen(true);
     setIsInfoModalOpen(false);
@@ -111,11 +136,17 @@ const VehicleCatalog: React.FC = () => {
   const handleSaveReservation = async (reservationData: {
     reservationDate: string;
     reservationDays: number;
+    clientID?: number;
     totalCost: string;
     vehicleId: number;
   }) => {
     try {
-      const isReservationCreated = await createReservation(reservationData);
+      let isReservationCreated:boolean
+      if (role === 'Empleado' ) {
+       isReservationCreated = await createRental(reservationData);
+      } else{
+        isReservationCreated = await createReservation(reservationData);
+      }
 
       if (!isReservationCreated) {
         console.log("Reserva guardada con éxito.");
@@ -186,19 +217,19 @@ const VehicleCatalog: React.FC = () => {
       const matchesType = !type || vehicle.type === type;
 
       const matchesDailyRate = (!advancedFilters.dailyRate[0] || vehicle.dailyRate >= advancedFilters.dailyRate[0]) &&
-                              (!advancedFilters.dailyRate[1] || vehicle.dailyRate <= advancedFilters.dailyRate[1]);
+        (!advancedFilters.dailyRate[1] || vehicle.dailyRate <= advancedFilters.dailyRate[1]);
       const matchesCapacity = (!advancedFilters.capacity[0] || vehicle.capacity >= advancedFilters.capacity[0]) &&
-                             (!advancedFilters.capacity[1] || vehicle.capacity <= advancedFilters.capacity[1]);
+        (!advancedFilters.capacity[1] || vehicle.capacity <= advancedFilters.capacity[1]);
       const matchesMaxSpeed = (!advancedFilters.maxSpeed[0] || vehicle.maxSpeed >= advancedFilters.maxSpeed[0]) &&
-                             (!advancedFilters.maxSpeed[1] || vehicle.maxSpeed <= advancedFilters.maxSpeed[1]);
+        (!advancedFilters.maxSpeed[1] || vehicle.maxSpeed <= advancedFilters.maxSpeed[1]);
       const matchesDoorCount = (!advancedFilters.doorCount[0] || vehicle.doorCount >= advancedFilters.doorCount[0]) &&
-                              (!advancedFilters.doorCount[1] || vehicle.doorCount <= advancedFilters.doorCount[1]);
+        (!advancedFilters.doorCount[1] || vehicle.doorCount <= advancedFilters.doorCount[1]);
       const matchesMileage = (!advancedFilters.mileage[0] || vehicle.mileage >= advancedFilters.mileage[0]) &&
-                            (!advancedFilters.mileage[1] || vehicle.mileage <= advancedFilters.mileage[1]);
+        (!advancedFilters.mileage[1] || vehicle.mileage <= advancedFilters.mileage[1]);
 
       return matchesSearch && matchesBrand && matchesDailyRate &&
-             matchesCapacity && matchesMaxSpeed && matchesDoorCount &&
-             matchesMileage && matchesYear && matchesType;
+        matchesCapacity && matchesMaxSpeed && matchesDoorCount &&
+        matchesMileage && matchesYear && matchesType;
     });
 
     setFilteredVehicles(filtered);
@@ -246,7 +277,7 @@ const VehicleCatalog: React.FC = () => {
         </Button>
       </div>
 
-      <Drawer
+      {canAccessAdvancedFilters(role) && (<Drawer
         title="Filtros Avanzados"
         open={isAdvancedFilterOpen}
         onClose={toggleAdvancedFilter}
@@ -377,6 +408,7 @@ const VehicleCatalog: React.FC = () => {
           </Select>
         </div>
       </Drawer>
+      )}
 
       <Row gutter={[16, 16]}>
         {filteredVehicles.map((vehicle) => (
@@ -448,7 +480,7 @@ const VehicleCatalog: React.FC = () => {
       )}
 
       {selectedVehicle && (
-        <NewReservationModal
+        <ReservationComponent
           visible={isReservationModalOpen}
           onClose={handleModalClose}
           onSave={handleSaveReservation}

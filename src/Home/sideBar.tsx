@@ -84,6 +84,12 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onLogout }) => {
     ],
     Empleado: [
       {
+        key: 'catalogo',
+        label: 'Catálogo',
+        icon: <HomeOutlined />,
+        route: '/Home',
+      },
+      {
         key: 'clientes',
         label: 'Clientes',
         icon: <UserOutlined />,
@@ -108,12 +114,6 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onLogout }) => {
         label: 'Catálogo',
         icon: <HomeOutlined />,
         route: '/Home',
-      },
-      {
-        key: 'rentas',
-        label: 'Rentas de Autos',
-        icon: <KeyOutlined />,
-        route: '/rent-vehicle',
       },
       {
         key: 'reservas',
