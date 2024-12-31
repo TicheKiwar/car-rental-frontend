@@ -11,9 +11,10 @@ import {
 import { IRental } from "../types/rentail";
 import { IVerify } from "../types/Verify";
 import ReservationEmployeeModal from "./rental.employee";
-import { deleteRental, fetchRental, updateRental } from "../services/rental.service";
+import { deleteRental, fetchRental, markRental, updateRental } from "../services/rental.service";
 import { verifyReservation } from "../services/reservation.service";
 import FormaPagoModal from "../payments/options.client";
+import FuelLevelModal from "./mark";
 
 const RentalManagement = () => {
   const [allReservations, setAllReservations] = useState<IRental[]>([]);
@@ -24,7 +25,7 @@ const RentalManagement = () => {
   const [deleteReservationId, setDeleteReservationId] = useState<number | null>(null);
   const [isConfirmDeleteModalVisible, setIsConfirmDeleteModalVisible] = useState(false);
   const [dniFilter, setDniFilter] = useState<string>('');
-
+  const [ismark, setIsMark] = useState(false);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -56,9 +57,21 @@ const RentalManagement = () => {
     }
   };
 
+  const handleMark = async (reservation: any, id: number) => {
+    try {
+      await markRental(id, reservation)
+      const updatedReservations = await fetchRental();
+      const filteredReservations = updatedReservations.filter(reservation =>
+        reservation.status !== 'CANCELADO'
+      );
+      setAllReservations(filteredReservations);
+      setTableData(filteredReservations);
+    } catch (error) {
+    }
+  }
+
   const handleSaveReservation = async (reservationData: any) => {
     try {
-      console.log("Reservation Data", reservationData);
       if (selectedReservation) {
         // Update existing reservation
         console.log("Updating reservation", selectedReservation.rentalId);
@@ -142,18 +155,24 @@ const RentalManagement = () => {
 
     useEffect(() => {
       const checkReservation = async () => {
-        setIsVerifying(true);
-        const result = await verifyReservationStatus({
-          createdAt: record.createdAt,
-          rentalDate: record.rentalDate,
-        });
-        const canCancel = (record.status === "En curso");
-        if (canCancel) {
-          setCanDelete(false);
+        try {
+          setIsVerifying(true);
+          const result = await verifyReservationStatus({
+            createdAt: record.createdAt,
+            rentalDate: record.rentalDate,
+          });
+
+          const canCancel = record.status === "En Curso";
+
+          setCanDelete(!canCancel);
+          setCanModify(result);
+        } catch (error) {
+          console.error('Error verifying reservation:', error);
+          setCanDelete(true);
+          setCanModify(false);
+        } finally {
+          setIsVerifying(false);
         }
-        setCanDelete(true);
-        setCanModify(result);
-        setIsVerifying(false);
       };
       checkReservation();
     }, [record]);
@@ -176,9 +195,13 @@ const RentalManagement = () => {
           title="Cancelar"
           disabled={!canDelete}
         />
+
         <Button
           icon={<CheckCircleFilled />}
-          onClick={() => handleDelete(record)}
+          onClick={() => {
+            setSelectedReservation(record);
+            setIsMark(true)
+          }}
           shape="circle"
           size="small"
           title="Marcar Retiro"
@@ -186,12 +209,14 @@ const RentalManagement = () => {
         />
         <Button
           icon={<DollarOutlined style={{ color: "green", }} />}
-          onClick={() =>{ setSelectedReservation(record);
-          setIsPago(true); 
-        }}
+          onClick={() => {
+            setSelectedReservation(record);
+            setIsPago(true);
+          }}
           shape="circle"
           size="small"
           title="Pagar"
+          disabled={!canDelete}
         />
       </Space>
     );
@@ -283,28 +308,36 @@ const RentalManagement = () => {
         columns={columns}
       />
 
-      <FormaPagoModal 
-          visible={isPago}
-          onClose={() => setIsPago(false)}
-          />
+      <FormaPagoModal
+        visible={isPago}
+        onClose={() => setIsPago(false)}
+        data={selectedReservation}
+      />
 
-        <ReservationEmployeeModal
-          visible={isModalVisible}
-          onClose={() => setIsModalVisible(false)}
-          onSave={handleSaveReservation}
-          reservation={selectedReservation}
-          isEditable={true}
-        />
-        <Modal
-          title="Confirmación"
-          open={isConfirmDeleteModalVisible}
-          onOk={confirmDelete}
-          onCancel={() => setIsConfirmDeleteModalVisible(false)}
-          okText="Sí"
-          cancelText="No"
-        >
-          <p>¿Estás seguro de que deseas Cancelar esta reserva?</p>
-        </Modal>
+      <ReservationEmployeeModal
+        visible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        onSave={handleSaveReservation}
+        reservation={selectedReservation}
+        isEditable={true}
+      />
+      <FuelLevelModal
+        visible={ismark}
+        onClose={() => setIsMark(false)}
+        onSubmit={handleMark}
+        reservation={selectedReservation}
+      />
+
+      <Modal
+        title="Confirmación"
+        open={isConfirmDeleteModalVisible}
+        onOk={confirmDelete}
+        onCancel={() => setIsConfirmDeleteModalVisible(false)}
+        okText="Sí"
+        cancelText="No"
+      >
+        <p>¿Estás seguro de que deseas Cancelar esta reserva?</p>
+      </Modal>
     </div>
   );
 };

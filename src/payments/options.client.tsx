@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Modal, Space } from 'antd';
 import { DollarOutlined, CreditCardOutlined, WalletOutlined } from '@ant-design/icons';
+import { StorageService } from '../services/storage';
 
 const PaymentButton = ({ icon, text, onClick }) => (
   <button
@@ -15,10 +16,12 @@ const PaymentButton = ({ icon, text, onClick }) => (
   </button>
 );
 
-const FormaPagoModal = ({ visible, onClose }) => {
+const FormaPagoModal = ({ visible, onClose, data }) => {
   const handlePaymentSelect = (method) => {
     window.open(`/payment/${method}`, '_blank', 'width=500,height=600');
   };
+  const role = StorageService.getItem("userRole");
+  StorageService.saveToLocalStorage('rentalData', data);
 
   return (
     <Modal
@@ -39,11 +42,24 @@ const FormaPagoModal = ({ visible, onClose }) => {
           text="PayPal"
           onClick={() => handlePaymentSelect('paypal')}
         />
-        <PaymentButton
-          icon={<DollarOutlined style={{ fontSize: '24px', color: '#059669' }} />}
-          text="Efectivo"
-          onClick={() => handlePaymentSelect('cash')}
-        />
+        {role.roleName === 'Cliente' && (
+          <>
+            <PaymentButton
+              icon={<DollarOutlined style={{ fontSize: '24px', color: '#059669' }} />}
+              text="Efectivo"
+              onClick={() => handlePaymentSelect('cash')}
+            />
+          </>
+        )}
+        {role.roleName === 'Empleado' && (
+          <>
+            <PaymentButton
+              icon={<DollarOutlined style={{ fontSize: '24px', color: '#059669' }} />}
+              text="Efectivo"
+              onClick={() => handlePaymentSelect('cash-e')}
+            />
+          </>
+        )}
       </Space>
     </Modal>
   );

@@ -82,3 +82,22 @@ export const deleteRental = async (reservationID: number) => {
         message.error("Error al eliminar la Reserva.");
     }   
 };
+
+export const markRental = async (reservationID: number, data:any) => {
+    try {
+        console.log("datos",reservationID,data)
+        const mark = { 
+            initialFuelLevel : data
+        }
+        console.log(mark)
+        const token = localStorage.getItem("authToken");
+        await api.patch(`/rental/mark/${reservationID}`,mark, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+    });
+        message.success("Salida del vehiculo marcada con éxito.");
+    } catch (error) {
+        message.error("Error al marcar la salida del vehiculo.");
+    }   
+};

@@ -8,4 +8,22 @@ export  const  StorageService = {
           return null;
         }
       },
+        
+   saveToLocalStorage : (key, value) => {
+    localStorage.setItem(key, JSON.stringify(value));
+  },
+
+  // Función para recuperar el objeto desde localStorage
+   loadFromLocalStorage : (key) => {
+    const storedValue = localStorage.getItem(key);
+    return storedValue ? JSON.parse(storedValue) : null;
+  },
+  removeItem: (key: string) => {
+    try {
+      localStorage.removeItem(key); 
+      console.log(`Item with key "${key}" removed from localStorage.`);
+    } catch (error) {
+      console.error('Error removing item from localStorage:', error);
+    }
+  },
 }

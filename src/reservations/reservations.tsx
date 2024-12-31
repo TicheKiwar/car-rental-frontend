@@ -11,6 +11,8 @@ import { deleteReservation, fetchReservations, updateReservation, verifyReservat
 import ReservationModal from "./reservation.modal";
 import { IRental } from "../types/rentail";
 import { IVerify } from "../types/Verify";
+import FormaPagoModal from "../payments/options.client";
+import FuelLevelModal from "../rental/mark";
 
 const ReservationManagement = () => {
   const [allReservations, setAllReservations] = useState<IRental[]>([]);
@@ -19,6 +21,7 @@ const ReservationManagement = () => {
   const [selectedReservation, setSelectedReservation] = useState<IRental | null>(null);
   const [deleteReservationId, setDeleteReservationId] = useState<number | null>(null);
   const [isConfirmDeleteModalVisible, setIsConfirmDeleteModalVisible] = useState(false);
+  const [isPago, setIsPago] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -165,7 +168,9 @@ const ReservationManagement = () => {
         />
         <Button
           icon={<DollarOutlined style={{color:"green",}}/>}
-          onClick={() => setSelectedReservation(record)}
+          onClick={() =>{ setSelectedReservation(record)
+            setIsPago(true);
+          }}
           shape="circle"
           size="small"
           title="Pagar"
@@ -245,6 +250,11 @@ const ReservationManagement = () => {
         dataSource={tableData.map((item) => ({ ...item, key: item.rentalId }))}
         columns={columns}
       />
+      <FormaPagoModal 
+          visible={isPago}
+          onClose={() => setIsPago(false)}
+          data={selectedReservation}
+          />
       <ReservationModal
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
@@ -252,6 +262,7 @@ const ReservationManagement = () => {
         reservation={selectedReservation}
         isEditable={true}
       />
+     
       <Modal
         title="Confirmación"
         open={isConfirmDeleteModalVisible}
