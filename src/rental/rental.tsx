@@ -13,15 +13,17 @@ import { IVerify } from "../types/Verify";
 import ReservationEmployeeModal from "./rental.employee";
 import { deleteRental, fetchRental, updateRental } from "../services/rental.service";
 import { verifyReservation } from "../services/reservation.service";
+import FormaPagoModal from "../payments/options.client";
 
 const RentalManagement = () => {
   const [allReservations, setAllReservations] = useState<IRental[]>([]);
   const [tableData, setTableData] = useState<IRental[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isPago, setIsPago] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState<IRental | null>(null);
   const [deleteReservationId, setDeleteReservationId] = useState<number | null>(null);
   const [isConfirmDeleteModalVisible, setIsConfirmDeleteModalVisible] = useState(false);
-  const [dniFilter, setDniFilter] = useState<string>(''); 
+  const [dniFilter, setDniFilter] = useState<string>('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -184,7 +186,9 @@ const RentalManagement = () => {
         />
         <Button
           icon={<DollarOutlined style={{ color: "green", }} />}
-          onClick={() => setSelectedReservation(record)}
+          onClick={() =>{ setSelectedReservation(record);
+          setIsPago(true); 
+        }}
           shape="circle"
           size="small"
           title="Pagar"
@@ -278,23 +282,29 @@ const RentalManagement = () => {
         dataSource={tableData.map((item) => ({ ...item, key: item.rentalId }))}
         columns={columns}
       />
-      <ReservationEmployeeModal
-        visible={isModalVisible}
-        onClose={() => setIsModalVisible(false)}
-        onSave={handleSaveReservation}
-        reservation={selectedReservation}
-        isEditable={true}
-      />
-      <Modal
-        title="Confirmación"
-        open={isConfirmDeleteModalVisible}
-        onOk={confirmDelete}
-        onCancel={() => setIsConfirmDeleteModalVisible(false)}
-        okText="Sí"
-        cancelText="No"
-      >
-        <p>¿Estás seguro de que deseas Cancelar esta reserva?</p>
-      </Modal>
+
+      <FormaPagoModal 
+          visible={isPago}
+          onClose={() => setIsPago(false)}
+          />
+
+        <ReservationEmployeeModal
+          visible={isModalVisible}
+          onClose={() => setIsModalVisible(false)}
+          onSave={handleSaveReservation}
+          reservation={selectedReservation}
+          isEditable={true}
+        />
+        <Modal
+          title="Confirmación"
+          open={isConfirmDeleteModalVisible}
+          onOk={confirmDelete}
+          onCancel={() => setIsConfirmDeleteModalVisible(false)}
+          okText="Sí"
+          cancelText="No"
+        >
+          <p>¿Estás seguro de que deseas Cancelar esta reserva?</p>
+        </Modal>
     </div>
   );
 };
