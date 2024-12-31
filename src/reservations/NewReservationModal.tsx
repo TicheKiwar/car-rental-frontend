@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, InputNumber, DatePicker, message, Descriptions } from "antd";
 import moment from "moment";
-import { IReservation } from "../types/reservation";
 import { Vehicle } from "../Vehicles/Ivehicle";
-import { createReservation } from "../services/reservation.service";
+import { IRental } from "../types/rentail";
 
 interface ReservationModalProps {
     visible: boolean;
@@ -14,7 +13,7 @@ interface ReservationModalProps {
         totalCost: string;
         vehicleId: number;  // Remove optional flag since it's required for new reservations
     }) => Promise<void>;  // Update return type to Promise<void>
-    reservation?: IReservation | null;
+    reservation?: IRental | null;
     vehicle?: Vehicle;
     isEditable?: boolean;
     isNew?: boolean;
@@ -36,14 +35,13 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
     useEffect(() => {
         if (visible) {
             if (reservation) {
-                setReservationDate(moment(reservation.reservationDate));
-                setReservationDays(reservation.reservationDays);
-                setTotalCost(reservation.totalCost.toString());
+                setReservationDate(moment(reservation.rentalDate));
+                setReservationDays(reservation.rentalDays);
+                setTotalCost((reservation.rentalDays*reservation.vehicle.dailyRate).toString());
 
                 form.setFieldsValue({
-                    reservationDate: moment(reservation.reservationDate),
-                    reservationDays: reservation.reservationDays,
-                    totalCost: reservation.totalCost
+                    rentalDate: moment(reservation.rentalDate),
+                    rentalDays: reservation.rentalDays,
                 });
             } else {
                 form.resetFields();
@@ -172,7 +170,7 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
                             value={reservationDate}
                             disabled={!isEditable}
                             disabledDate={(current) => {
-                                if (reservation?.reservationDate === current?.format("YYYY-MM-DD")) {
+                                if (reservation?.rentalDate ) {
                                     return false;
                                 }
                                 return current && current < moment().startOf("day");

@@ -12,6 +12,11 @@ import ReturnManagment from "./ReturnVehicle/ReturnManagment";
 import ClientsManagement from "./Users/clients.page";
 import EmployeesManagement from "./Users/employees.page";
 import ReservationManagement from "./reservations/reservations";
+import RentalManagement from "./rental/rental";
+import CreditCardForm from "./payments/payment.creditcart";
+import PayPalForm from "./payments/payment.paypal";
+import CashForm from "./payments/payments.cash";
+import CashEmployeForm from "./payments/payment.emloyee";
 
 function App() {
   return (
@@ -22,7 +27,10 @@ function App() {
         <Route path="/register" element={<RegistrationForm />} />
           <Route path="/password_reset" element={<ForgotPassword />} />
           <Route path="/reset_password/:token" element={<ResetPassword />} />
-
+          <Route path="/payment/card" element={<CreditCardForm />} />
+          <Route path="/payment/paypal" element={<PayPalForm />} />
+          <Route path="/payment/cash" element={<CashForm />} />
+          <Route path="/payment/cash-e" element={<CashEmployeForm />} />
         {/* Rutas protegidas dentro del MainLayout */}
         <Route element={<MainLayout />}>
           <Route path="/home" element={<Home />} />
@@ -33,6 +41,7 @@ function App() {
           <Route path="/employee-management" element={<EmployeesManagement />} />
           <Route path="/admin-management" element={<ModelManagement />} />
           <Route path="/Reservations" element={<ReservationManagement />} />
+          <Route path="/rent-vehicle" element={<RentalManagement />} />
         </Route>
       </Routes>
     </Router>
