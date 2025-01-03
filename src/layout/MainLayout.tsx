@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {  useEffect, useState } from "react";
 import Sidebar from "../Home/sideBar";
 import { Layout, Row, Col, Typography } from "antd";
 import { Outlet, useNavigate } from "react-router-dom";
@@ -6,13 +6,11 @@ import "./mainLayout.css";
 import logo from "../assets/logo-car.png";
 
 const { Header, Footer, Content } = Layout;
-
 const MainLayout: React.FC = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const { Header } = Layout;
 const { Title } = Typography;
-
 useEffect(() => {
   let userRole = localStorage.getItem("userRole");
 
@@ -41,7 +39,7 @@ useEffect(() => {
       {/* Renderiza Sidebar solo cuando los datos están listos */}
       <Sidebar role={user.roleName} onLogout={handleLogout} />
 
-      <Layout style={{ marginLeft: 200 }}>
+      <Layout style={{ marginLeft: 70 }}>
         {/* Header */}
         <Header
       style={{
@@ -131,5 +129,4 @@ useEffect(() => {
     </Layout>
   );
 };
-
 export default MainLayout;

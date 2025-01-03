@@ -1,12 +1,14 @@
+import { Vehicle } from "../Vehicles/Ivehicle";
+import { Client } from "./Client";
+
 export interface IRental {
     rentalId: number;
-    initialStatus: string;
-    finalStatus: string | null;
     initialFuelLevel: number | null;
-    finalFuelLevel: number | null;
-    initialMileage: number;
-    finalMileage: number | null;
     totalDays: number | null;
-    totalCost: string;
     status: string;
+    rentalDate: Date;
+    rentalDays: number;
+    createdAt: Date;
+    vehicle: Vehicle;
+    client: Client;
   }

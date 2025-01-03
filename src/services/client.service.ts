@@ -11,6 +11,16 @@ export const getClients = async (): Promise<Client[]> => {
     }
 };
 
+export const getClientByDni = async (id: string): Promise<Client> => {
+    try {
+        const response = await api.get(`/clients/dni/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error(`Error al obtener el cliente`, error);
+        throw error;
+    }
+};
+
 export const createClient = async (userData: any) => {
     try {
         const response = await api.post("/clients", userData);

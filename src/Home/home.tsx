@@ -1,18 +1,14 @@
-import React from "react";
-import Menu from "./menu";
+import React, { useEffect, useState } from "react";
 import "./home.css";
-import Sidebar from "./sideBar";
 import { Layout } from "antd";
 import VehicleCatalog from "../catalog/catalog";
+import { StorageService } from "../services/storage";
 
 const { Content, Footer } = Layout;
 
 const Home: React.FC = () => {
-  const handleLogout = () => {
-    console.log('Cerrar sesión'); // Aquí puedes integrar tu lógica de logout
-  };
 
-  const userRole = 'employee'; // Cambiar dinámicamente según el rol del usuario
+const role =  StorageService.getItem("userRole");
 
   return (
         <Content>
@@ -29,7 +25,7 @@ const Home: React.FC = () => {
 
             {/* Main Content */}
             <div>
-              <VehicleCatalog />
+                <VehicleCatalog role={role.roleName}/>
             </div>
           </div>
         </Content>
