@@ -79,11 +79,6 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onLogout }) => {
             icon: <CrownOutlined />,
             route: '/admin-management',
           },
-<<<<<<< HEAD
-          
-          
-=======
->>>>>>> 24b8134e04f2db1e76f314261ad927d1fc0a9394
         ],
       },
     ],
