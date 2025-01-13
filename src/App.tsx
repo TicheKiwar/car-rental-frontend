@@ -9,14 +9,15 @@ import ResetPassword from "./auth/resetPassword";
 import Home from "./Home/home";
 import MainLayout from "./layout/MainLayout"
 import ReturnManagment from "./ReturnVehicle/ReturnManagment";
+import ReservationManagement from "./reservations/reservations";
 import ClientsManagement from "./Users/clients.page";
 import EmployeesManagement from "./Users/employees.page";
-import ReservationManagement from "./reservations/reservations";
-import RentalManagment from "./Rental/RentalManagment";
 import CreditCardForm from "./payments/payment.creditcart";
 import PayPalForm from "./payments/payment.paypal";
 import CashForm from "./payments/payments.cash";
 import CashEmployeForm from "./payments/payment.emloyee";
+import RentalManagement from "./rental/rental";
+
 
 function App() {
   return (
@@ -37,13 +38,11 @@ function App() {
           <Route path="/vehicle-management" element={<VehicleManagement />} />
           <Route path="/model-management" element={<ModelManagement />} />
           <Route path="/return-vehicle" element={<ReturnManagment />} />
-          <Route path="/rent-vehicle" element={<RentalManagment />} />
-
           <Route path="/client-management" element={<ClientsManagement />} />
           <Route path="/employee-management" element={<EmployeesManagement />} />
           <Route path="/admin-management" element={<ModelManagement />} />
+          <Route path="/rent-vehicle" element={<RentalManagement />} />
           <Route path="/Reservations" element={<ReservationManagement />} />
-        
         </Route>
       </Routes>
     </Router>

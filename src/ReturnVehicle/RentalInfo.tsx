@@ -38,25 +38,25 @@ const ReturnInformacion = ({ visible, onClose, reserva }) => {
 
   return (
     <Modal
-      title={<Title level={3} style={{ fontSize: '24px', textAlign: 'center' }}>Información</Title>} // Título aumentado y centrado
+      title={<Title level={3} style={{ textAlign: 'center' }}>Información</Title>}
       visible={visible}
       onCancel={onClose}
       footer={[<Button key="close" onClick={onClose}>Cerrar</Button>]}
-      width={750} // Aumenté el tamaño del modal
+      width={750}
     >
-      <Row gutter={[24, 24]}> {/* Más espacio entre las columnas */}
+      <Row gutter={[24, 24]}>
         {/* Columna 1: Información del Cliente y del Auto */}
         <Col span={12}>
           {/* Información del Cliente */}
-          <Title level={4} style={{ fontSize: '18px' }}>Información del Cliente</Title>
-          <Text strong style={{ fontSize: '16px' }}>Cliente:</Text> <Text style={{ fontSize: '16px' }}>{clienteInfo.nombre}</Text><br />
-          <Text strong style={{ fontSize: '16px' }}>Cédula:</Text> <Text style={{ fontSize: '16px' }}>{clienteInfo.cedula}</Text><br />
-          <Text strong style={{ fontSize: '16px' }}>Celular:</Text> <Text style={{ fontSize: '16px' }}>{clienteInfo.celular}</Text><br />
-          <Text strong style={{ fontSize: '16px' }}>Dirección:</Text> <Text style={{ fontSize: '16px' }}>{clienteInfo.direccion}</Text><br />
-          
+          <Title level={4}>Información del Cliente</Title>
+          <Text strong>Cliente:</Text> <Text>{clienteInfo.nombre}</Text><br />
+          <Text strong>Cédula:</Text> <Text>{clienteInfo.cedula}</Text><br />
+          <Text strong>Celular:</Text> <Text>{clienteInfo.celular}</Text><br />
+          <Text strong>Dirección:</Text> <Text>{clienteInfo.direccion}</Text><br />
+
           {/* Información del Vehículo */}
-          <Divider style={{ margin: '20px 0' }} />
-          <Title level={4} style={{ fontSize: '18px' }}>Información del Vehículo</Title>
+          <Divider />
+          <Title level={4}>Información del Vehículo</Title>
           <Row>
             <Col span={8}>
               <Image
@@ -69,10 +69,10 @@ const ReturnInformacion = ({ visible, onClose, reserva }) => {
               />
             </Col>
             <Col span={16}>
-              <Text strong style={{ fontSize: '16px' }}>Placa:</Text> <Text style={{ fontSize: '16px' }}>{autoInfo.placa}</Text><br />
-              <Text strong style={{ fontSize: '16px' }}>Marca:</Text> <Text style={{ fontSize: '16px' }}>{autoInfo.marca}</Text><br />
-              <Text strong style={{ fontSize: '16px' }}>Modelo:</Text> <Text style={{ fontSize: '16px' }}>{autoInfo.modelo}</Text><br />
-              <Text strong style={{ fontSize: '16px' }}>Color:</Text> <Text style={{ fontSize: '16px' }}>{autoInfo.color}</Text><br />
+              <Text strong>Placa:</Text> <Text>{autoInfo.placa}</Text><br />
+              <Text strong>Marca:</Text> <Text>{autoInfo.marca}</Text><br />
+              <Text strong>Modelo:</Text> <Text>{autoInfo.modelo}</Text><br />
+              <Text strong>Color:</Text> <Text>{autoInfo.color}</Text><br />
             </Col>
           </Row>
         </Col>
@@ -80,19 +80,19 @@ const ReturnInformacion = ({ visible, onClose, reserva }) => {
         {/* Columna 2: Información de la Reserva y del Empleado */}
         <Col span={12}>
           {/* Información de la Reserva */}
-          <Title level={4} style={{ fontSize: '18px' }}>Información de la Reserva</Title>
-          <Text strong style={{ fontSize: '16px' }}>Fecha Reservación:</Text> <Text style={{ fontSize: '16px' }}>{reservaInfo.fechaReservacion}</Text><br />
-          <Text strong style={{ fontSize: '16px' }}>Días de la Reservación:</Text> <Text style={{ fontSize: '16px' }}>{reservaInfo.diasReservacion}</Text><br />
-          <Text strong style={{ fontSize: '16px' }}>Costo por Día:</Text> <Text style={{ fontSize: '16px' }}>{reservaInfo.costoPorDia}</Text><br />
-          <Text strong style={{ fontSize: '16px' }}>Costo por Día Retraso:</Text> <Text style={{ fontSize: '16px' }}>{reservaInfo.costoPorDiaDeRetraso}</Text><br />
+          <Title level={4}>Información de la Reserva</Title>
+          <Text strong>Fecha Reservación:</Text> <Text>{reservaInfo.fechaReservacion}</Text><br />
+          <Text strong>Días de la Reservación:</Text> <Text>{reservaInfo.diasReservacion}</Text><br />
+          <Text strong>Costo por Día:</Text> <Text>{reservaInfo.costoPorDia}</Text><br />
+          <Text strong>Costo por Día Retraso:</Text> <Text>{reservaInfo.costoPorDiaDeRetraso}</Text><br />
 
-          <Divider style={{ margin: '20px 0' }} />
+          <Divider />
 
           {/* Información del Empleado */}
-          <Title level={4} style={{ fontSize: '18px' }}>Información del Empleado</Title>
-          <Text strong style={{ fontSize: '16px' }}>Empleado Encargado:</Text> <Text style={{ fontSize: '16px' }}>{reservaInfo.empleadoEncargado}</Text><br />
-          <Text strong style={{ fontSize: '16px' }}>Cédula Empleado:</Text> <Text style={{ fontSize: '16px' }}>{reservaInfo.cedulaEmpleado}</Text><br />
-          <Text strong style={{ fontSize: '16px' }}>Teléfono del Empleado:</Text> <Text style={{ fontSize: '16px' }}>{reservaInfo.telefonoEmpleado}</Text><br />
+          <Title level={4}>Información del Empleado</Title>
+          <Text strong>Empleado Encargado:</Text> <Text>{reservaInfo.empleadoEncargado}</Text><br />
+          <Text strong>Cédula Empleado:</Text> <Text>{reservaInfo.cedulaEmpleado}</Text><br />
+          <Text strong>Teléfono del Empleado:</Text> <Text>{reservaInfo.telefonoEmpleado}</Text><br />
         </Col>
       </Row>
 
@@ -101,7 +101,7 @@ const ReturnInformacion = ({ visible, onClose, reserva }) => {
         visible={imageVisible}
         footer={null}
         onCancel={() => setImageVisible(false)}
-        width={600} 
+        width={600}
       >
         <Image src={autoInfo.imagen} alt="Imagen del Auto" />
       </Modal>

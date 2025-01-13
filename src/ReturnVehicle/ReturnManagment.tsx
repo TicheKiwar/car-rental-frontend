@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Input, Table, Button, Space, Form, Select, message } from "antd";
-import { EditOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import { DollarCircleOutlined, EditOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import ReturnInformacion from './RentalInfo';
 import ModalForm from './ReturnForm';
-import { getRentals, postRentalReturn } from "../services/return.service";
-import { ReturnDetails } from "../ReturnVehicle/IReturn";
+import { getRentals, getReturnDetails, postRentalReturn } from "../services/return.service";
+import { ReturnDetails, ReturnCosts } from "../ReturnVehicle/IReturn";
+import ModalFormCost from "./ReturnPayment";
 
 const { Option } = Select;
 
@@ -15,11 +16,12 @@ const ReturnManagment = () => {
   const [tableData, setTableData] = useState<ReturnDetails[]>([]);
   const [visibleInfo, setVisibleInfo] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState<ReturnDetails | null>(null);
+  const [visiblePaymentModal, setVisiblePaymentModal] = useState(false); // Estado para el modal de pago
+  const [paymentDetails, setPaymentDetails] = useState<ReturnCosts | null>(null); // Datos del retorno
   const [visibleEdit, setVisibleEdit] = useState(false);
   const [form] = Form.useForm();
 
   useEffect(() => {
-    // Fetch data from backend
     const fetchData = async () => {
       try {
         const rentals = await getRentals();
@@ -42,6 +44,18 @@ const ReturnManagment = () => {
       (selectedStatus === "TODOS" || reserva.rental_status.toUpperCase() === selectedStatus)
     );
   });
+
+  const handlePaymentClick = async (record: ReturnDetails) => {
+    try {
+      console.log("Datos: ", record);
+      const details = await getReturnDetails(record.rental_id);
+      setPaymentDetails(details); // Guarda los detalles en el estado
+      setVisiblePaymentModal(true); // Muestra el modal
+    } catch (error) {
+      console.error("Error al obtener detalles de pago:", error);
+      message.error("No se pudo cargar la información de pago. Intenta de nuevo.");
+    }
+  };
 
   const handleInfoClick = (record: ReturnDetails) => {
     setSelectedReservation(record);
@@ -88,7 +102,7 @@ const ReturnManagment = () => {
       },
     },
     {
-      title: "Auto",
+      title: "Vehículo",
       dataIndex: "image",
       key: "image",
       render: (image: string) => (
@@ -97,8 +111,8 @@ const ReturnManagment = () => {
     },
     {
       title: "Fecha de reserva",
-      dataIndex: "reservation_date",
-      key: "reservation_date",
+      dataIndex: "rental_date",
+      key: "rental_date",
       render: (date: string) => {
         const formattedDate = new Date(date).toLocaleDateString("es-ES"); // Formato dd/mm/yyyy
         return <span>{formattedDate}</span>;
@@ -108,7 +122,7 @@ const ReturnManagment = () => {
       title: "Fecha máxima de entrega",
       key: "max_return_date",
       render: (_: any, record: ReturnDetails) => {
-        const maxReturnDate = getMaxReturnDate(record.reservation_date, record.reservation_days);
+        const maxReturnDate = getMaxReturnDate(record.rental_date, record.rental_days);
         return <span>{maxReturnDate}</span>;
       },
     },
@@ -129,28 +143,44 @@ const ReturnManagment = () => {
     {
       title: "Acciones",
       key: "acciones",
-      render: (_: any, record: ReturnDetails) => (
-        <Space size="middle">
-          <Button
-            icon={<InfoCircleOutlined />}
-            shape="circle"
-            size="small"
-            title="Información"
-            style={{ color: "green" }}
-            onClick={() => handleInfoClick(record)}
-          />
-          <Button
-            icon={<EditOutlined />}
-            shape="circle"
-            size="small"
-            title="Editar"
-            style={{ color: "#e65100" }}
-            onClick={() => handleEditClick(record)}
-            disabled={record.rental_status.toUpperCase() === "PENDIENTE"} // Deshabilitar si el estado es "PENDIENTE"
-          />
-        </Space>
-      ),
-    },
+      render: (_: any, record: ReturnDetails) => {
+        const estado = record.rental_status.toUpperCase();
+        return (
+          <Space size="middle">
+            <Button
+              icon={<InfoCircleOutlined />}
+              shape="circle"
+              size="small"
+              title="Información"
+              style={{ color: "green" }}
+              onClick={() => handleInfoClick(record)}
+            />
+            {/* Ícono de Edición */}
+            {estado === "EN CURSO" && (
+              <Button
+                icon={<EditOutlined />}
+                shape="circle"
+                size="small"
+                title="Editar"
+                style={{ color: "#e65100" }}
+                onClick={() => handleEditClick(record)}
+              />
+            )}
+
+            {estado === "PENDIENTE" && (
+              <Button
+                icon={<DollarCircleOutlined />}
+                shape="circle"
+                size="small"
+                title="Registrar Pago"
+                style={{ color: "#1976d2" }}
+                onClick={() => handlePaymentClick(record)} 
+              />
+            )}
+          </Space>
+        );
+      },
+    }
   ];
 
   return (
@@ -201,6 +231,16 @@ const ReturnManagment = () => {
           onCancel={() => setVisibleEdit(false)}
           handleSubmit={handleSubmit}
           reserva={selectedReservation}
+          form={form}
+        />
+      )}
+
+            {paymentDetails && (
+        <ModalFormCost
+          visible={visiblePaymentModal}
+          onCancel={() => setVisiblePaymentModal(false)}
+          reserva={paymentDetails}
+          handleSubmit={handleSubmit}
           form={form}
         />
       )}
