@@ -9,6 +9,8 @@ import {
   RedoOutlined,
   CrownOutlined,
   TeamOutlined,
+  KeyOutlined,
+  ToolOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
@@ -72,16 +74,16 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onLogout }) => {
             icon: <TeamOutlined />,
             route: '/employee-management',
           },
-          {
-            key: 'administradores',
-            label: 'Administradores',
-            icon: <CrownOutlined />,
-            route: '/admin-management',
-          },
         ],
       },
     ],
     Empleado: [
+      {
+        key: 'catalogo',
+        label: 'Catálogo',
+        icon: <HomeOutlined />,
+        route: '/Home',
+      },
       {
         key: 'clientes',
         label: 'Clientes',
@@ -89,10 +91,22 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onLogout }) => {
         route: '/client-management',
       },
       {
+        key: 'rentas',
+        label: 'Rentas de Autos',
+        icon: <KeyOutlined />,
+        route: '/rent-vehicle',
+      },
+      {
         key: 'devolucion',
         label: 'Devolución de Autos',
         icon: <RedoOutlined />,
         route: '/return-vehicle',
+      },
+      {
+        key: 'mantenimiento',
+        label: 'Mantenimiento de Autos',
+        icon: <ToolOutlined />,
+        route: '/vehicle-maintenance',
       },
     ],
     Cliente: [
