@@ -102,7 +102,9 @@ const MaintenancePage: React.FC = () => {
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', justifyContent: 'center', marginTop: '35px' }}>
                 {paginatedMaintenances.map((maintenance) => {
-                        const formattedDescription = maintenance.description.replace(/\n/g, '<br />');
+                    const formattedDescription = maintenance.description 
+                    ? maintenance.description.replace(/\n/g, '<br />') 
+                    : 'Sin descripción disponible';
                     return(
                     <Card
                         key={maintenance.maintenanceId}

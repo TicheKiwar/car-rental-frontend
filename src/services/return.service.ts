@@ -1,5 +1,5 @@
 import { api } from "./api.service";
-import { InsertReturn, ReturnDetails } from "../ReturnVehicle/IReturn";
+import { InsertReturn, ReturnDetails, ReturnCosts, updateRentalReturn } from "../ReturnVehicle/IReturn";
 
 export const getRentals = async (): Promise<ReturnDetails[]> => {
     try {
@@ -18,6 +18,27 @@ export const postRentalReturn = async (returnData: InsertReturn): Promise<any> =
         return response.data; 
     } catch (error) {
         console.error("Error al enviar los datos de retorno:", error);
+        throw error;  
+    }
+};
+
+export const payRental = async (returnPayData: updateRentalReturn): Promise<any> => {
+    try {
+        
+        const response = await api.post("/payment/update", returnPayData);  
+        return response.data; 
+    } catch (error) {
+        console.error("Error al enviar los datos de retorno:", error);
+        throw error;  
+    }
+};
+
+export const getReturnDetails = async (returnId: number): Promise<ReturnCosts> => {
+    try {
+        const response = await api.get(`/returns/${returnId}`);  // Usamos el parámetro returnId para hacer la petición a un retorno específico
+        return response.data; // Retorna los datos obtenidos del backend
+    } catch (error) {
+        console.error("Error al obtener los detalles del retorno:", error);
         throw error;  
     }
 };

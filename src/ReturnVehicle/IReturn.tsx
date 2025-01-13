@@ -12,10 +12,13 @@ export interface ReturnDetails {
     daily_rate: number;
     cost_day_delay: number;
     mileage:number;
+    motor_number: string;//nuevo
+    chasis_number: string;//nuevo
+
     //Reservation
-    reservation_id: number;
-    reservation_date: string;
-    reservation_days: number;
+
+    rental_date: string;//modificado
+    rental_days: number;//modificado
 
     //Clientes
     client_id: number;
@@ -30,9 +33,22 @@ export interface ReturnDetails {
     employee_first_name: string;
     employee_last_name: string;
     employee_phone: string;
+    //Vehicle
     model_id: number;
     model_name: string;
     brand_name: string;
+    
+    //Vehicle_Detail
+    vehicle_id_detail: number;
+    scratches:boolean;
+    dents:boolean;
+    lights:boolean;
+    tires:boolean;
+    windshield:boolean;
+    mirrors:boolean;
+    foreign_fluids:boolean;
+    brakes:boolean;
+    documents:boolean;
 }
 // Definimos la interfaz ReturnDetails con las propiedades correspondientes
 export interface InsertReturn {
@@ -43,13 +59,63 @@ export interface InsertReturn {
     returnTime: string;
     observations: string;
     finalMileage: number;
-    totalDays: number;
+    //totalDays: number;
     rentalStatus: string;
     finalFuelLevel: number;
-    finalStatus: string;
+    //finalStatus: string;
     vehicleStatus: string;
     fuelCost: number;
     costDayDelay: number;
     costPerDamages: number;
+    //vehicle status
+    scratches: boolean;
+    dents: boolean;
+    lights: boolean;
+    tires: boolean;
+    windshield: boolean;
+    mirrors: boolean;
+    foreign_fluids: boolean;
+    brakes: boolean;
+    documents: boolean;
   }
-  
+
+  export interface ReturnCosts {
+    return_id: number;
+    cost_day_delay: number;
+    cost_per_damages: number;
+    returnDate: string; // Si se requiere una fecha, puede ser Date en vez de string.
+    fuel_cost: number;
+    observations: string;
+    rental_id: number;
+    rentalStatus: string;
+    vehicleId: number;
+    clientId: number;
+    clientDni: string;
+    clientFirstName: string;
+    clientLastName: string;
+    clientPhone: string;
+    clientAddress: string;
+    mileage: number;
+    motor_number: string;
+    chasis_number: string;
+    scratches: boolean;
+    dents: boolean;
+    lights: boolean;
+    tires: boolean;
+    windshield: boolean;
+    mirrors: boolean;
+    foreignFluids: boolean;
+    brakes: boolean;
+    documents: boolean;
+}
+
+export interface updateRentalReturn{
+  rentalId: number;
+  returnId: number;
+  amount : number;
+  rentalStatus: string;
+  //
+  paymentType: string; 
+  paymentMethodId: number;
+}
+
