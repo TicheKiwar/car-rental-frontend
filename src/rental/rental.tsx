@@ -14,7 +14,7 @@ import ReservationEmployeeModal from "./rental.employee";
 import { deleteRental, fetchRental, markRental, updateRental } from "../services/rental.service";
 import { verifyReservation } from "../services/reservation.service";
 import FormaPagoModal from "../payments/options.client";
-import FuelLevelModal from "./mark";
+import FuelLevelModal from "./mark"
 
 const RentalManagement = () => {
   const [allReservations, setAllReservations] = useState<IRental[]>([]);
