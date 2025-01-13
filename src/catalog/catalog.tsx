@@ -45,9 +45,7 @@ const VehicleCatalog: React.FC<VehicleCatalogProps> = ({ role}) => {
     return ['Administrador', 'Empleado', 'Cliente'].includes(userRole);
   };
 
-  const canAccessAdvancedFilters = (userRole: Role): boolean => {
-    return ['Administrador', 'Empleado'].includes(userRole);
-  };
+
   const getInitialAdvancedFilters = (maxVals: typeof maxValues) => ({
     dailyRate: [0, maxVals.dailyRate],
     capacity: [0, maxVals.capacity],
@@ -277,7 +275,7 @@ const VehicleCatalog: React.FC<VehicleCatalogProps> = ({ role}) => {
         </Button>
       </div>
 
-      {canAccessAdvancedFilters(role) && (<Drawer
+      <Drawer
         title="Filtros Avanzados"
         open={isAdvancedFilterOpen}
         onClose={toggleAdvancedFilter}
@@ -408,7 +406,6 @@ const VehicleCatalog: React.FC<VehicleCatalogProps> = ({ role}) => {
           </Select>
         </div>
       </Drawer>
-      )}
 
       <Row gutter={[16, 16]}>
         {filteredVehicles.map((vehicle) => (
