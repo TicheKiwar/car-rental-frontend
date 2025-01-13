@@ -10,9 +10,9 @@ pipeline {
         
         stage('Build Frontend') {
             steps {
-                dir('frontend') {
+                
                     sh 'docker-compose -f docker-compose-f.yml build frontend'
-                }
+                
             }
         }
         
