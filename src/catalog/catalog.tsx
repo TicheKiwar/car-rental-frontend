@@ -117,9 +117,9 @@ const VehicleCatalog: React.FC<VehicleCatalogProps> = ({ role}) => {
     }
     return NewReservationModal;
   };
-  const ReservationComponent = getReservationComponent(role);
+  const ReservationComponent = getReservationComponent(role!);
   const handleReservationModalOpen = (vehicle: Vehicle) => {
-    if (!canMakeReservation(role)) {
+    if (!canMakeReservation(role!)) {
       Modal.error({
         title: 'Acceso Denegado',
         content: 'Debe iniciar sesión para realizar una reserva.',
