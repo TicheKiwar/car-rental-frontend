@@ -3,7 +3,7 @@ import { Input, Table, Button, Space, Form, Select, message } from "antd";
 import { DollarCircleOutlined, EditOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import ReturnInformacion from './RentalInfo';
 import ModalForm from './ReturnForm';
-import { getRentals, getReturnDetails, postRentalReturn } from "../services/return.service";
+import { getRentals, getReturnDetails,  postRentalReturn, payRental } from "../services/return.service";
 import { ReturnDetails, ReturnCosts } from "../ReturnVehicle/IReturn";
 import ModalFormCost from "./ReturnPayment";
 
@@ -11,7 +11,6 @@ const { Option } = Select;
 
 const ReturnManagment = () => {
   const [cliente, setCliente] = useState("");
-  const [auto, setAuto] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string | null>("TODOS");
   const [tableData, setTableData] = useState<ReturnDetails[]>([]);
   const [visibleInfo, setVisibleInfo] = useState(false);
@@ -40,7 +39,6 @@ const ReturnManagment = () => {
             .toLowerCase()
             .includes(cliente.toLowerCase())
         : true) &&
-      (auto ? reserva.image.toLowerCase().includes(auto.toLowerCase()) : true) &&
       (selectedStatus === "TODOS" || reserva.rental_status.toUpperCase() === selectedStatus)
     );
   });
@@ -85,6 +83,22 @@ const ReturnManagment = () => {
     }
   };
 
+  const handlePayDetailsSubmit = async (formData) => {
+    try {
+      const response = await payRental(formData); // Reemplaza con tu servicio de envío
+      console.log("Respuesta del servidor:", formData);
+      message.success("Se registro su pago");
+      // Actualiza la tabla tras el envío exitoso
+      const updatedRentals = await getRentals();
+      setTableData(updatedRentals);
+
+      setVisibleEdit(false); // Cierra el modal
+    } catch (error) {
+      console.error("Error al enviar los datos:", error);
+      message.error("Error al registrar la devolución. Intenta de nuevo.");
+    }
+  };
+
   const getMaxReturnDate = (reservation_date: string, reservation_days: number): string => {
     const date = new Date(reservation_date);
     date.setDate(date.getDate() + reservation_days);
@@ -97,7 +111,23 @@ const ReturnManagment = () => {
       dataIndex: "rental_status",
       key: "estado",
       render: (rental_status: string) => {
-        const color = rental_status.toUpperCase() === "ATRASADO" ? "red" : "orange";
+        let color = "";
+        switch (rental_status.toUpperCase()) {
+          case "ATRASADO":
+            color = "red";
+            break;
+          case "EN CURSO":
+            color = "blue";
+            break;
+          case "PAGADO":
+            color = "green";
+            break;
+          case "PENDIENTE":
+            color = "orange";
+            break;
+          default:
+            color = "black"; // Default color if the status doesn't match
+        }
         return <span style={{ color }}>{rental_status.toUpperCase()}</span>;
       },
     },
@@ -194,12 +224,6 @@ const ReturnManagment = () => {
           value={cliente}
           style={{ width: "200px" }}
         />
-        <Input
-          placeholder="Filtrar por Auto"
-          onChange={(e) => setAuto(e.target.value)}
-          value={auto}
-          style={{ width: "200px" }}
-        />
         <Select
           placeholder="Filtrar por Estado"
           onChange={(value) => setSelectedStatus(value)}
@@ -235,12 +259,12 @@ const ReturnManagment = () => {
         />
       )}
 
-            {paymentDetails && (
+      {paymentDetails && (
         <ModalFormCost
           visible={visiblePaymentModal}
           onCancel={() => setVisiblePaymentModal(false)}
           reserva={paymentDetails}
-          handleSubmit={handleSubmit}
+          handleSubmit={handlePayDetailsSubmit}
           form={form}
         />
       )}

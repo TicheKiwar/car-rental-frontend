@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Form, InputNumber, Button, Row, Col } from 'antd';
-import { DollarOutlined } from '@ant-design/icons';  // Importamos el ícono de dinero
+import { Modal, Form, InputNumber, Button, Row, Col, Radio, message } from 'antd';
+import { CreditCardOutlined, CreditCardTwoTone, DollarOutlined, PayCircleOutlined } from '@ant-design/icons';
 
 const ModalFormCost = ({ visible, onCancel, reserva, handleSubmit, form }) => {
-  const [totalAmount, setTotalAmount] = useState(0);  // Estado para almacenar el total
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [paymentMethod, setPaymentMethod] = useState(null); // Estado para el método de pago
 
   useEffect(() => {
     if (reserva) {
@@ -11,14 +12,13 @@ const ModalFormCost = ({ visible, onCancel, reserva, handleSubmit, form }) => {
         delayCost: parseFloat(reserva.cost_day_delay) || 0,
         fuelCost: parseFloat(reserva.fuel_cost) || 0,
       });
-      calculateTotal();  // Calcular el total cuando se cargan los valores
+      calculateTotal();
     }
   }, [reserva, form]);
 
   const delayCostValue = parseFloat(reserva?.cost_day_delay) || 0;
   const fuelCostValue = parseFloat(reserva?.fuel_cost) || 0;
 
-  // Función para calcular el total
   const calculateTotal = () => {
     const formValues = form.getFieldsValue();
     const {
@@ -42,15 +42,52 @@ const ModalFormCost = ({ visible, onCancel, reserva, handleSubmit, form }) => {
       (fluidsCost || 0) + (brakesCost || 0) + (documentsCost || 0) +
       (additionalCosts || 0);
 
-    setTotalAmount(total);  // Actualizamos el total
+    setTotalAmount(total);
   };
 
-  // Función para actualizar el total cuando el usuario modifica algún campo
   const onValuesChange = () => {
     calculateTotal();
   };
 
-  // Condición para mostrar u ocultar los campos según el valor
+  const validateFields = () => {
+    const formValues = form.getFieldsValue() as FormValues;
+
+    for (const [key, value] of Object.entries(formValues)) {
+      const numericValue = parseFloat(value as string); // Convierte el valor a número
+
+      if (isNaN(numericValue)) {
+        message.error(`El campo "${key}" no es un número válido.`);
+        return false;
+      }
+
+      if (numericValue <= 0) { // Verifica si el valor es menor o igual a cero
+        message.error(`El campo "${key}" debe ser mayor a cero.`);
+        return false;
+      }
+    }
+
+    if (!paymentMethod) {
+      message.error('Debe seleccionar un método de pago.');
+      return false;
+    }
+
+    return true;
+  };
+
+  const onFinish = () => {
+    if (!validateFields()) return;
+
+    const payload = {
+      rentalId: reserva.rental_id,
+      returnId: reserva.return_id,
+      amount: totalAmount,
+      rentalStatus: 'Pagado',
+      paymentType: 'RETURN',
+      paymentMethodId: paymentMethod,
+    };
+    handleSubmit(payload);
+  };
+
   const showDelayCost = delayCostValue > 0;
   const showFuelCost = fuelCostValue > 0;
 
@@ -62,7 +99,7 @@ const ModalFormCost = ({ visible, onCancel, reserva, handleSubmit, form }) => {
       footer={null}
       width={800}
     >
-      <Form form={form} onFinish={handleSubmit} onValuesChange={onValuesChange}>
+      <Form form={form} onFinish={onFinish} onValuesChange={onValuesChange}>
         <Row gutter={16}>
           <Col span={12}>
             <div>
@@ -144,7 +181,8 @@ const ModalFormCost = ({ visible, onCancel, reserva, handleSubmit, form }) => {
 
               {!reserva?.windshield && (
                 <Form.Item name="windshieldCost" label="Costo Parabrisas">
-                  <InputNumber min={0} />
+                  <InputNumber min={0}
+                  />
                 </Form.Item>
               )}
 
@@ -177,6 +215,15 @@ const ModalFormCost = ({ visible, onCancel, reserva, handleSubmit, form }) => {
               </Form.Item>
             </div>
 
+            <div style={{ marginTop: '20px' }}>
+              <h4>MÉTODO DE PAGO</h4>
+              <Radio.Group onChange={(e) => setPaymentMethod(e.target.value)}>
+                <Radio value={1}><PayCircleOutlined style={{ fontSize: 20, marginRight: 8 }} />Paypal</Radio>
+                <Radio value={2}><CreditCardOutlined style={{ fontSize: 20, marginRight: 8 }} />Tarjeta</Radio>
+                <Radio value={3}><CreditCardTwoTone style={{ fontSize: 20, marginRight: 8 }} />Efectivo</Radio>
+              </Radio.Group>
+            </div>
+
             <div style={{ marginTop: '20px', textAlign: 'center' }}>
               <h3><DollarOutlined /> Total a Pagar: {totalAmount} $</h3>
             </div>
@@ -193,3 +240,17 @@ const ModalFormCost = ({ visible, onCancel, reserva, handleSubmit, form }) => {
 };
 
 export default ModalFormCost;
+interface FormValues {
+  delayCost?: number;
+  fuelCost?: number;
+  scratchesCost?: number;
+  dentsCost?: number;
+  lightsCost?: number;
+  tiresCost?: number;
+  windshieldCost?: number;
+  mirrorsCost?: number;
+  fluidsCost?: number;
+  brakesCost?: number;
+  documentsCost?: number;
+  additionalCosts?: number;
+}

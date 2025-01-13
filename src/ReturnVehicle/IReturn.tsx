@@ -80,13 +80,13 @@ export interface InsertReturn {
   }
 
   export interface ReturnCosts {
-    returnId: number;
+    return_id: number;
     cost_day_delay: number;
     cost_per_damages: number;
     returnDate: string; // Si se requiere una fecha, puede ser Date en vez de string.
     fuel_cost: number;
     observations: string;
-    rentalId: number;
+    rental_id: number;
     rentalStatus: string;
     vehicleId: number;
     clientId: number;
@@ -108,3 +108,14 @@ export interface InsertReturn {
     brakes: boolean;
     documents: boolean;
 }
+
+export interface updateRentalReturn{
+  rentalId: number;
+  returnId: number;
+  amount : number;
+  rentalStatus: string;
+  //
+  paymentType: string; 
+  paymentMethodId: number;
+}
+
