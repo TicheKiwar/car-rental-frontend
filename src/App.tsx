@@ -17,6 +17,7 @@ import CreditCardForm from "./payments/payment.creditcart";
 import PayPalForm from "./payments/payment.paypal";
 import CashForm from "./payments/payments.cash";
 import CashEmployeForm from "./payments/payment.emloyee";
+import MaintenancePage from "./Vehicles/maintenance";
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
           <Route path="/return-vehicle" element={<ReturnManagment />} />
           <Route path="/client-management" element={<ClientsManagement />} />
           <Route path="/employee-management" element={<EmployeesManagement />} />
+          <Route path="/vehicle-maintenance" element={<MaintenancePage />} />
           <Route path="/admin-management" element={<ModelManagement />} />
           <Route path="/Reservations" element={<ReservationManagement />} />
           <Route path="/rent-vehicle" element={<RentalManagement />} />
