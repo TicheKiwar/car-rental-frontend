@@ -2,10 +2,11 @@ services:
   frontend:
     build:
       context: ./
-      dockerfile: Dockerfile 
+      dockerfile: Dockerfile
     ports:
       - "80:80" 
-    depends_on:
-      - backend
     networks:
       - app_network
+networks:
+  app_network:
+    external: true
