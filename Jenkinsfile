@@ -10,20 +10,26 @@ pipeline {
         
         stage('Build Frontend') {
             steps {
-                
-                    sh 'docker-compose -f docker-compose-f.yml build frontend'
-                
+                sh 'docker-compose -f docker-compose-f.yml build frontend'
             }
         }
         
-        stage('Deploy') {
+        stage('Stop and Remove Previous Containers') {
             steps {
+                // Detener y eliminar contenedores existentes
                 sh '''
                     docker-compose -f docker-compose-f.yml down || true
-                    docker-compose -f docker-compose-f.yml up -d
                 '''
             }
         }
         
+        stage('Deploy Frontend') {
+            steps {
+                // Reiniciar contenedores con puertos fijos
+                sh '''
+                    docker-compose -f docker-compose-f.yml up -d
+                '''
+            }
+        }
     }
 }
