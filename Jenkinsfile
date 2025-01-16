@@ -11,7 +11,7 @@ pipeline {
         stage('Build Frontend') {
             steps {
                 sh 'docker-compose -f docker-compose-f.yml build frontend'
-                echo 'build application'
+                echo 'build application...'
             }
         }
         
